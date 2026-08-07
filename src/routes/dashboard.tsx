@@ -291,6 +291,7 @@ function Dashboard() {
   const store = useStore();
   const activeId = profileId ?? store.activeProfileId;
   const profile = getProfile(activeId);
+  const search = activeId ? { student: activeId } : undefined;
 
   // No redirect — default to web-dev if no track selected (better for demos/evaluators)
   const trackId = store.selectedTrackId ?? profile.student.selectedTrackId ?? "web-dev";

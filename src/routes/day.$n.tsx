@@ -101,8 +101,9 @@ function Field({
 function DayPage() {
   const { n } = Route.useParams();
   const { student: profileId } = Route.useSearch();
-  const profile = getProfile(profileId);
   const store = useStore();
+  const activeId = profileId ?? store.activeProfileId;
+  const profile = getProfile(activeId);
   const dayNumber = Number(n);
 
   // Resolve track
