@@ -509,7 +509,6 @@ function Dashboard() {
             <BrutalLink
               to="/day/$n"
               params={{ n: String(today.dayNumber) }}
-              search={search}
               variant="ink"
               className="mt-6 w-full sm:w-auto"
             >
@@ -535,11 +534,11 @@ function Dashboard() {
             </p>
           ) : null}
           <div className="mt-5">
-            <DayGrid days={days} currentSearch={search} />
+            <DayGrid days={days} />
           </div>
 
           {/* Search/filter */}
-          <DaySearch days={days} searchState={search} />
+          <DaySearch days={days} />
         </Panel>
 
         {/* Achievements */}
@@ -558,7 +557,6 @@ function Dashboard() {
               <BrutalLink
                 to="/day/$n"
                 params={{ n: String(today.dayNumber) }}
-                search={search}
                 className="mt-4"
               >
                 Unlock your first badge
