@@ -136,7 +136,7 @@ export function Pill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 font-mono mono-label uppercase tracking-[0.16em]",
+        "inline-flex max-w-full items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-center font-mono mono-label uppercase tracking-[0.16em]",
         tones[tone],
         className,
       )}
