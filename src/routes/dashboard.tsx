@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Flame,
@@ -289,8 +289,15 @@ function DaySearch({
 function Dashboard() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
-  const profile = getProfile(profileId);
-  const search = profileId ? { student: profileId } : undefined;
+
+  // Sync URL search param to store if explicitly provided
+  useEffect(() => {
+    if (profileId && profileId !== store.activeProfileId) {
+      store.switchProfile(profileId);
+    }
+  }, [profileId, store.activeProfileId, store.switchProfile]);
+
+  const profile = getProfile(store.activeProfileId);
 
   // No redirect — default to web-dev if no track selected (better for demos/evaluators)
   const trackId = store.selectedTrackId ?? profile.student.selectedTrackId ?? "web-dev";
@@ -335,7 +342,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={student} cta={false} searchState={search} />
+      <Nav cta={false} />
 
       {/* Milestone celebration */}
       {activeMilestone && (
@@ -363,12 +370,12 @@ function Dashboard() {
             </span>
             <div className="inline-flex border-2 border-ink bg-card-surface p-0.5 shadow-brutal-sm">
               {profileList.map((p) => {
-                const active = p.id === (profileId ?? "mid");
+                const active = p.id === store.activeProfileId;
                 return (
-                  <Link
+                  <button
                     key={p.id}
-                    to="/dashboard"
-                    search={{ student: p.id }}
+                    type="button"
+                    onClick={() => store.switchProfile(p.id)}
                     className={cn(
                       "px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-all",
                       active
@@ -377,7 +384,7 @@ function Dashboard() {
                     )}
                   >
                     {p.label}
-                  </Link>
+                  </button>
                 );
               })}
             </div>

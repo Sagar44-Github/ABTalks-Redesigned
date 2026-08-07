@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -102,8 +102,14 @@ function DayPage() {
   const { n } = Route.useParams();
   const { student: profileId } = Route.useSearch();
   const store = useStore();
-  const activeId = profileId ?? store.activeProfileId;
-  const profile = getProfile(activeId);
+
+  useEffect(() => {
+    if (profileId && profileId !== store.activeProfileId) {
+      store.switchProfile(profileId);
+    }
+  }, [profileId, store.activeProfileId, store.switchProfile]);
+
+  const profile = getProfile(store.activeProfileId);
   const dayNumber = Number(n);
 
   // Resolve track

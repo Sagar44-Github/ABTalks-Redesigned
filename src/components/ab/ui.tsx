@@ -227,18 +227,14 @@ export function LogoIcon({ className }: { className?: string }) {
 }
 
 export function Nav({
-  student,
   cta = true,
-  searchState,
 }: {
-  student?: { name: string; initials: string };
   cta?: boolean;
-  searchState?: Record<string, string | undefined>;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const store = useStore();
-  const currentProfile = getProfile(store.activeProfileId);
-  const currentStudent = student ?? currentProfile.student;
+  const profile = getProfile(store.activeProfileId);
+  const student = profile.student;
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
@@ -284,21 +280,20 @@ export function Nav({
         <div className="flex items-center gap-2">
           <Link
             to="/u/$username"
-            params={{ username: currentStudent.name.toLowerCase().replace(/\s+/g, "-") }}
+            params={{ username: student.name.toLowerCase().replace(/\s+/g, "-") }}
             className="flex items-center gap-2 border-2 border-ink bg-card-surface px-2 py-1.5 press"
           >
             <span className="flex h-7 w-7 items-center justify-center bg-blue font-display text-label-small text-on-blue">
-              {currentStudent.initials}
+              {student.initials}
             </span>
             <span className="hidden font-display text-label-small uppercase sm:inline">
-              {currentStudent.name}
+              {student.name}
             </span>
           </Link>
           <ThemeToggle />
           {cta ? (
             <BrutalLink
               to="/onboarding"
-              search={searchState}
               className="hidden px-3 py-2 text-label-small sm:inline-flex sm:px-5 sm:py-3 sm:text-label-bold"
             >
               Start your streak
@@ -356,30 +351,36 @@ export function Nav({
             </Link>
             <div className="mt-2 border-t border-muted-ink/20 pt-2">
               <MonoLabel>Demo profiles</MonoLabel>
-              <Link
-                to="/dashboard"
-                search={{ student: "mid" }}
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+              <button
+                type="button"
+                onClick={() => {
+                  store.switchProfile("mid");
+                  setMobileOpen(false);
+                }}
+                className="flex w-full items-center gap-2 px-2 py-2 text-left font-display text-label-bold uppercase hover:text-blue"
               >
                 Riya (mid-challenge)
-              </Link>
-              <Link
-                to="/dashboard"
-                search={{ student: "first-day" }}
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  store.switchProfile("first-day");
+                  setMobileOpen(false);
+                }}
+                className="flex w-full items-center gap-2 px-2 py-2 text-left font-display text-label-bold uppercase hover:text-blue"
               >
                 Arjun (day one)
-              </Link>
-              <Link
-                to="/dashboard"
-                search={{ student: "empty" }}
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  store.switchProfile("empty");
+                  setMobileOpen(false);
+                }}
+                className="flex w-full items-center gap-2 px-2 py-2 text-left font-display text-label-bold uppercase hover:text-blue"
               >
                 Sana (empty profile)
-              </Link>
+              </button>
             </div>
           </div>
         </nav>
@@ -389,6 +390,7 @@ export function Nav({
 }
 
 export function Footer() {
+  const store = useStore();
   return (
     <footer className="border-t-2 border-ink bg-footer-dark text-on-footer">
       <div className="mx-auto max-w-[1440px] px-4 py-12 md:px-10">
@@ -436,9 +438,27 @@ export function Footer() {
           <div>
             <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Demo profiles</p>
             <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
-              <Link to="/dashboard" search={{ student: "mid" }} className="hover:text-yellow">Riya Nandan (mid-challenge)</Link>
-              <Link to="/dashboard" search={{ student: "first-day" }} className="hover:text-yellow">Arjun Mehta (day one)</Link>
-              <Link to="/dashboard" search={{ student: "empty" }} className="hover:text-yellow">Sana Qureshi (empty)</Link>
+              <button
+                type="button"
+                onClick={() => store.switchProfile("mid")}
+                className="text-left font-display text-label-small uppercase hover:text-yellow"
+              >
+                Riya Nandan (mid-challenge)
+              </button>
+              <button
+                type="button"
+                onClick={() => store.switchProfile("first-day")}
+                className="text-left font-display text-label-small uppercase hover:text-yellow"
+              >
+                Arjun Mehta (day one)
+              </button>
+              <button
+                type="button"
+                onClick={() => store.switchProfile("empty")}
+                className="text-left font-display text-label-small uppercase hover:text-yellow"
+              >
+                Sana Qureshi (empty)
+              </button>
             </nav>
           </div>
         </div>

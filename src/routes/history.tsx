@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { ArrowRight, ExternalLink, GitCommitHorizontal, Linkedin } from "lucide-react";
 import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
 import { getProfile, type ProfileId } from "@/data/abtalks";
@@ -27,9 +28,15 @@ export const Route = createFileRoute("/history")({
 function HistoryPage() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
-  const activeId = profileId ?? store.activeProfileId;
-  const profile = getProfile(activeId);
-  const search = activeId ? { student: activeId } : undefined;
+
+  // Sync URL search param to store if explicitly provided
+  useEffect(() => {
+    if (profileId && profileId !== store.activeProfileId) {
+      store.switchProfile(profileId);
+    }
+  }, [profileId, store.activeProfileId, store.switchProfile]);
+
+  const profile = getProfile(store.activeProfileId);
 
   const profileSubmissions = profile.days
     .filter((d) => d.status === "completed" && d.submission)
@@ -55,7 +62,7 @@ function HistoryPage() {
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={profile.student} cta={false} />
+      <Nav cta={false} />
 
       <main className="mx-auto max-w-[900px] px-4 py-8 md:px-10 md:py-12">
         <MonoLabel>Submission history</MonoLabel>
