@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, GitCommitHorizontal, Linkedin, Snowflake } from "lucide-react";
-import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
+import { BrutalLink, Footer, LogoFull, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
 import { platformStats, tracks } from "@/data/abtalks";
 
 export const Route = createFileRoute("/")({
@@ -53,9 +53,12 @@ function Landing() {
       <main>
         {/* Hero */}
         <section className="mx-auto max-w-[1440px] px-4 pb-14 pt-12 md:px-10 md:pb-24 md:pt-20">
-          <Pill tone="red">
-            <span className="h-1.5 w-1.5 rounded-full bg-current" /> Cohort live now
-          </Pill>
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <LogoFull className="h-10 md:h-12 w-auto" />
+            <Pill tone="red">
+              <span className="h-1.5 w-1.5 rounded-full bg-current" /> Cohort live now
+            </Pill>
+          </div>
           <h1 className="mt-5 max-w-4xl font-display text-hero-clamp uppercase">
             60 days.
             <br />

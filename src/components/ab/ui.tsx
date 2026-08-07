@@ -161,6 +161,70 @@ export function ThemeToggle() {
   );
 }
 
+export function LogoFull({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 360 90"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="ABTalks"
+      className={cn("h-9 w-auto shrink-0", className)}
+    >
+      <title>ABTalks</title>
+      <rect x="14" y="14" width="60" height="60" fill="#000000" />
+      <rect x="10" y="10" width="60" height="60" fill="#FFCC00" stroke="#000000" strokeWidth="4" />
+      <path d="M22 54 L30 20 L34 20 L28 54 Z" fill="#000000" />
+      <rect x="23" y="40" width="12" height="4" fill="#000000" />
+      <rect x="40" y="20" width="5" height="34" fill="#000000" />
+      <path d="M45 20 L54 20 Q59 20 59 27 Q59 34 54 34 L45 34 Z" fill="#000000" />
+      <path d="M45 34 L55 34 Q60 34 60 41 Q60 54 55 54 L45 54 Z" fill="#000000" />
+      <text
+        x="88"
+        y="52"
+        fontFamily="'Space Grotesk', sans-serif"
+        fontSize="34"
+        fontWeight="900"
+        letterSpacing="-1.5"
+        className="fill-ink"
+      >
+        ABTALKS
+      </text>
+      <text
+        x="88"
+        y="70"
+        fontFamily="'JetBrains Mono', monospace"
+        fontSize="10"
+        fontWeight="700"
+        letterSpacing="1"
+        className="fill-muted-ink"
+      >
+        60-DAY CHALLENGE
+      </text>
+    </svg>
+  );
+}
+
+export function LogoIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 80 80"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="ABTalks Icon"
+      className={cn("h-8 w-8 shrink-0", className)}
+    >
+      <title>ABTalks Icon</title>
+      <rect x="12" y="12" width="60" height="60" fill="#000000" />
+      <rect x="8" y="8" width="60" height="60" fill="#FFCC00" stroke="#000000" strokeWidth="4" />
+      <path d="M20 52 L28 18 L32 18 L26 52 Z" fill="#000000" />
+      <rect x="21" y="38" width="12" height="4" fill="#000000" />
+      <rect x="38" y="18" width="5" height="34" fill="#000000" />
+      <path d="M43 18 L52 18 Q57 18 57 25 Q57 32 52 32 L43 32 Z" fill="#000000" />
+      <path d="M43 32 L53 32 Q58 32 58 39 Q58 52 53 52 L43 52 Z" fill="#000000" />
+    </svg>
+  );
+}
+
 export function Nav({
   student,
   cta = true,
@@ -175,8 +239,8 @@ export function Nav({
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-3 md:px-10">
-        <Link to="/" className="font-display text-subheading uppercase tracking-[-0.04em]">
-          ABTALKS
+        <Link to="/" className="flex items-center gap-2 press">
+          <LogoFull className="h-9 w-auto" />
         </Link>
 
         {/* Desktop nav links */}
@@ -318,7 +382,25 @@ export function Footer() {
   return (
     <footer className="border-t-2 border-ink bg-footer-dark text-on-footer">
       <div className="mx-auto max-w-[1440px] px-4 py-12 md:px-10">
-        <p className="font-display text-heading-2 uppercase">ABTALKS</p>
+        <Link to="/" className="inline-block press">
+          <svg
+            viewBox="0 0 360 90"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="ABTalks"
+            className="h-10 w-auto"
+          >
+            <rect x="14" y="14" width="60" height="60" fill="#000000" />
+            <rect x="10" y="10" width="60" height="60" fill="#FFCC00" stroke="#000000" strokeWidth="4" />
+            <path d="M22 54 L30 20 L34 20 L28 54 Z" fill="#000000" />
+            <rect x="23" y="40" width="12" height="4" fill="#000000" />
+            <rect x="40" y="20" width="5" height="34" fill="#000000" />
+            <path d="M45 20 L54 20 Q59 20 59 27 Q59 34 54 34 L45 34 Z" fill="#000000" />
+            <path d="M45 34 L55 34 Q60 34 60 41 Q60 54 55 54 L45 54 Z" fill="#000000" />
+            <text x="88" y="52" fontFamily="'Space Grotesk', sans-serif" fontSize="34" fontWeight="900" letterSpacing="-1.5" fill="#f5f0e8">ABTALKS</text>
+            <text x="88" y="70" fontFamily="'JetBrains Mono', monospace" fontSize="10" fontWeight="700" letterSpacing="1" fill="#ffcc00">60-DAY CHALLENGE</text>
+          </svg>
+        </Link>
         <p className="mt-3 max-w-md text-body opacity-80">
           60 days. One commit, one post, every day. Proof of work you can show a recruiter.
         </p>
