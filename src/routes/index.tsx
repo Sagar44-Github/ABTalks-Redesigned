@@ -54,7 +54,7 @@ function Landing() {
         {/* Hero */}
         <section className="mx-auto max-w-[1440px] px-4 pb-14 pt-12 md:px-10 md:pb-24 md:pt-20">
           <div className="mb-6 flex flex-wrap items-center gap-3">
-            <LogoFull className="h-10 md:h-12 w-auto" />
+            <LogoFull className="h-14 md:h-18 w-auto" />
             <Pill tone="red">
               <span className="h-1.5 w-1.5 rounded-full bg-current" /> Cohort live now
             </Pill>

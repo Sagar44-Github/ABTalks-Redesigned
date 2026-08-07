@@ -164,11 +164,11 @@ export function ThemeToggle() {
 export function LogoFull({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 360 90"
+      viewBox="8 8 238 68"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="ABTalks"
-      className={cn("h-11 md:h-13 w-auto shrink-0", className)}
+      className={cn("h-12 md:h-16 w-auto shrink-0", className)}
     >
       <title>ABTalks</title>
       <rect x="14" y="14" width="60" height="60" fill="#000000" />
@@ -240,7 +240,7 @@ export function Nav({
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3.5 md:px-10">
         <Link to="/" className="flex items-center gap-2 press">
-          <LogoFull className="h-11 md:h-13 w-auto" />
+          <LogoFull className="h-12 md:h-16 w-auto" />
         </Link>
 
         {/* Desktop nav links */}
@@ -384,11 +384,11 @@ export function Footer() {
       <div className="mx-auto max-w-[1440px] px-4 py-12 md:px-10">
         <Link to="/" className="inline-block press">
           <svg
-            viewBox="0 0 360 90"
+            viewBox="8 8 238 68"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="ABTalks"
-            className="h-10 w-auto"
+            className="h-16 md:h-20 w-auto"
           >
             <rect x="14" y="14" width="60" height="60" fill="#000000" />
             <rect x="10" y="10" width="60" height="60" fill="#FFCC00" stroke="#000000" strokeWidth="4" />
