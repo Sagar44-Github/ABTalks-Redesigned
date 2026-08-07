@@ -27,41 +27,34 @@ export const Route = createFileRoute("/history")({
 function HistoryPage() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
-  const isDemoProfile = profileId === "mid" || profileId === "first-day" || profileId === "empty";
-  const profile = getProfile(profileId);
-  const search = profileId ? { student: profileId } : {};
+  const activeId = profileId ?? store.activeProfileId;
+  const profile = getProfile(activeId);
 
-  // For a demo profile (mid, first-day, empty), include that demo profile's mock submissions.
-  // For the actual logged-in user (no demo profile query param), use ONLY store.submissions!
-  const profileSubmissions = isDemoProfile
-    ? profile.days
-        .filter((d) => d.status === "completed" && d.submission)
-        .map((d) => ({
-          dayNumber: d.dayNumber,
-          trackId: profile.student.selectedTrackId ?? "web-dev",
-          taskTitle: d.title,
-          submittedAt: d.submission!.submittedAt,
-          githubUrl: d.submission!.githubUrl,
-          linkedinUrl: d.submission!.linkedinUrl,
-          status: d.status,
-        }))
-    : [];
+  const profileSubmissions = profile.days
+    .filter((d) => d.status === "completed" && d.submission)
+    .map((d) => ({
+      dayNumber: d.dayNumber,
+      trackId: profile.student.selectedTrackId ?? "web-dev",
+      taskTitle: d.title,
+      submittedAt: d.submission!.submittedAt,
+      githubUrl: d.submission!.githubUrl,
+      linkedinUrl: d.submission!.linkedinUrl,
+      status: d.status,
+    }));
 
-  const allSubmissions = isDemoProfile
-    ? [...store.submissions, ...profileSubmissions]
-        .filter(
-          (item, index, self) =>
-            index === self.findIndex((s) => s.dayNumber === item.dayNumber),
-        )
-        .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
-    : [...store.submissions].sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  const allSubmissions = [...store.submissions, ...profileSubmissions]
+    .filter(
+      (item, index, self) =>
+        index === self.findIndex((s) => s.dayNumber === item.dayNumber),
+    )
+    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 
-  const frozenDays = isDemoProfile ? profile.days.filter((d) => d.status === "frozen") : [];
+  const frozenDays = profile.days.filter((d) => d.status === "frozen");
   const isEmpty = allSubmissions.length === 0 && frozenDays.length === 0;
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={isDemoProfile ? profile.student : undefined} cta={false} searchState={search} />
+      <Nav student={profile.student} cta={false} />
 
       <main className="mx-auto max-w-[900px] px-4 py-8 md:px-10 md:py-12">
         <MonoLabel>Submission history</MonoLabel>
@@ -69,7 +62,8 @@ function HistoryPage() {
           Your proof of work
         </h1>
         <p className="mt-3 max-w-xl text-body">
-          Every commit and post you&apos;ve submitted, in reverse chronological order.
+          Every commit and post submitted for{" "}
+          <span className="font-display text-label-bold text-blue">{profile.student.name}</span>.
         </p>
 
         {isEmpty ? (
@@ -81,7 +75,7 @@ function HistoryPage() {
                 Your history starts the moment you submit your first proof. One commit link, one
                 post link — that&apos;s all it takes. Today&apos;s task is waiting.
               </p>
-              <BrutalLink to="/dashboard" search={search} className="mt-6">
+              <BrutalLink to="/dashboard" className="mt-6">
                 Go to today&apos;s task <ArrowRight size={18} strokeWidth={3} />
               </BrutalLink>
             </div>

@@ -1,9 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { DayStatus, MockTimeOfDay, SubmissionRecord } from "@/data/abtalks";
+import type { DayStatus, MockTimeOfDay, ProfileId, SubmissionRecord } from "@/data/abtalks";
 
 /* ── Persisted state shape ── */
 
 export type AppState = {
+  activeProfileId: ProfileId;
   selectedTrackId: string | null;
   dayStatusOverrides: Record<string, DayStatus>; // key: "trackId:dayNumber"
   submissions: SubmissionRecord[];
@@ -21,6 +22,7 @@ export type AppState = {
 const STORAGE_KEY = "abtalks-store";
 
 const defaultState: AppState = {
+  activeProfileId: "mid",
   selectedTrackId: null,
   dayStatusOverrides: {},
   submissions: [],
@@ -59,6 +61,7 @@ function saveState(state: AppState) {
 /* ── Context ── */
 
 type StoreActions = {
+  switchProfile: (profileId: ProfileId) => void;
   selectTrack: (trackId: string) => void;
   useStreakFreeze: (dayNumber: number) => void;
   submitDay: (record: SubmissionRecord) => void;
@@ -91,6 +94,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrated) saveState(state);
   }, [state, hydrated]);
+
+  const switchProfile = useCallback((profileId: ProfileId) => {
+    setState((s) => ({ ...s, activeProfileId: profileId }));
+  }, []);
 
   const selectTrack = useCallback((trackId: string) => {
     setState((s) => ({ ...s, selectedTrackId: trackId }));
@@ -169,6 +176,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const ctx = useMemo<StoreCtx>(
     () => ({
       ...state,
+      switchProfile,
       selectTrack,
       useStreakFreeze,
       submitDay,

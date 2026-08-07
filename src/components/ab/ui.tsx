@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Moon, Sun, Snowflake, History, Trophy, FileText, Settings, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/theme";
+import { useStore } from "@/lib/store";
 import type { ChallengeDay, DayStatus } from "@/data/abtalks";
 import { useState } from "react";
 
@@ -235,6 +236,9 @@ export function Nav({
   searchState?: Record<string, string | undefined>;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const store = useStore();
+  const currentProfile = getProfile(store.activeProfileId);
+  const currentStudent = student ?? currentProfile.student;
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
@@ -247,28 +251,24 @@ export function Nav({
         <nav className="hidden items-center gap-2 lg:flex">
           <Link
             to="/dashboard"
-            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Dashboard
           </Link>
           <Link
             to="/history"
-            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             History
           </Link>
           <Link
             to="/leaderboard"
-            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Leaderboard
           </Link>
           <Link
             to="/settings"
-            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Settings
@@ -282,20 +282,18 @@ export function Nav({
         </nav>
 
         <div className="flex items-center gap-2">
-          {student ? (
-            <Link
-              to="/u/$username"
-              params={{ username: student.name.toLowerCase().replace(/\s+/g, "-") }}
-              className="flex items-center gap-2 border-2 border-ink bg-card-surface px-2 py-1.5 press"
-            >
-              <span className="flex h-7 w-7 items-center justify-center bg-blue font-display text-label-small text-on-blue">
-                {student.initials}
-              </span>
-              <span className="hidden font-display text-label-small uppercase sm:inline">
-                {student.name}
-              </span>
-            </Link>
-          ) : null}
+          <Link
+            to="/u/$username"
+            params={{ username: currentStudent.name.toLowerCase().replace(/\s+/g, "-") }}
+            className="flex items-center gap-2 border-2 border-ink bg-card-surface px-2 py-1.5 press"
+          >
+            <span className="flex h-7 w-7 items-center justify-center bg-blue font-display text-label-small text-on-blue">
+              {currentStudent.initials}
+            </span>
+            <span className="hidden font-display text-label-small uppercase sm:inline">
+              {currentStudent.name}
+            </span>
+          </Link>
           <ThemeToggle />
           {cta ? (
             <BrutalLink
@@ -323,7 +321,6 @@ export function Nav({
           <div className="flex flex-col gap-1">
             <Link
               to="/dashboard"
-              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -331,7 +328,6 @@ export function Nav({
             </Link>
             <Link
               to="/history"
-              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -339,7 +335,6 @@ export function Nav({
             </Link>
             <Link
               to="/leaderboard"
-              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -347,7 +342,6 @@ export function Nav({
             </Link>
             <Link
               to="/settings"
-              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -363,20 +357,34 @@ export function Nav({
             <div className="mt-2 border-t border-muted-ink/20 pt-2">
               <MonoLabel>Demo profiles</MonoLabel>
               <Link
-                to="/u/$username"
-                params={{ username: "riya-nandan" }}
-                onClick={() => setMobileOpen(false)}
+                to="/dashboard"
+                onClick={() => {
+                  store.switchProfile("mid");
+                  setMobileOpen(false);
+                }}
                 className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
               >
                 Riya (mid-challenge)
               </Link>
               <Link
-                to="/u/$username"
-                params={{ username: "arjun-mehta" }}
-                onClick={() => setMobileOpen(false)}
+                to="/dashboard"
+                onClick={() => {
+                  store.switchProfile("first-day");
+                  setMobileOpen(false);
+                }}
                 className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
               >
                 Arjun (day one)
+              </Link>
+              <Link
+                to="/dashboard"
+                onClick={() => {
+                  store.switchProfile("empty");
+                  setMobileOpen(false);
+                }}
+                className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+              >
+                Sana (empty profile)
               </Link>
             </div>
           </div>
@@ -387,6 +395,7 @@ export function Nav({
 }
 
 export function Footer() {
+  const store = useStore();
   return (
     <footer className="border-t-2 border-ink bg-footer-dark text-on-footer">
       <div className="mx-auto max-w-[1440px] px-4 py-12 md:px-10">
@@ -434,9 +443,27 @@ export function Footer() {
           <div>
             <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Demo profiles</p>
             <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
-              <Link to="/u/$username" params={{ username: "riya-nandan" }} className="hover:text-yellow">Riya Nandan (mid-challenge)</Link>
-              <Link to="/u/$username" params={{ username: "arjun-mehta" }} className="hover:text-yellow">Arjun Mehta (day one)</Link>
-              <Link to="/u/$username" params={{ username: "sana-qureshi" }} className="hover:text-yellow">Sana Qureshi (empty)</Link>
+              <Link
+                to="/dashboard"
+                onClick={() => store.switchProfile("mid")}
+                className="text-left hover:text-yellow"
+              >
+                Riya Nandan (mid-challenge)
+              </Link>
+              <Link
+                to="/dashboard"
+                onClick={() => store.switchProfile("first-day")}
+                className="text-left hover:text-yellow"
+              >
+                Arjun Mehta (day one)
+              </Link>
+              <Link
+                to="/dashboard"
+                onClick={() => store.switchProfile("empty")}
+                className="text-left hover:text-yellow"
+              >
+                Sana Qureshi (empty)
+              </Link>
             </nav>
           </div>
         </div>
