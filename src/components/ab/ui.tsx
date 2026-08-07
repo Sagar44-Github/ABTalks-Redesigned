@@ -4,7 +4,7 @@ import { Moon, Sun, Snowflake, History, Trophy, FileText, Settings, Menu, X } fr
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/theme";
 import { useStore } from "@/lib/store";
-import type { ChallengeDay, DayStatus } from "@/data/abtalks";
+import { getProfile, type ChallengeDay, type DayStatus } from "@/data/abtalks";
 import { useState } from "react";
 
 export function MonoLabel({
