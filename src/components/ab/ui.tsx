@@ -168,7 +168,7 @@ export function LogoFull({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="ABTalks"
-      className={cn("h-9 w-auto shrink-0", className)}
+      className={cn("h-11 md:h-13 w-auto shrink-0", className)}
     >
       <title>ABTalks</title>
       <rect x="14" y="14" width="60" height="60" fill="#000000" />
@@ -207,20 +207,20 @@ export function LogoFull({ className }: { className?: string }) {
 export function LogoIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 80 80"
+      viewBox="0 0 68 68"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="ABTalks Icon"
-      className={cn("h-8 w-8 shrink-0", className)}
+      className={cn("h-10 w-10 shrink-0", className)}
     >
       <title>ABTalks Icon</title>
-      <rect x="12" y="12" width="60" height="60" fill="#000000" />
-      <rect x="8" y="8" width="60" height="60" fill="#FFCC00" stroke="#000000" strokeWidth="4" />
-      <path d="M20 52 L28 18 L32 18 L26 52 Z" fill="#000000" />
-      <rect x="21" y="38" width="12" height="4" fill="#000000" />
-      <rect x="38" y="18" width="5" height="34" fill="#000000" />
-      <path d="M43 18 L52 18 Q57 18 57 25 Q57 32 52 32 L43 32 Z" fill="#000000" />
-      <path d="M43 32 L53 32 Q58 32 58 39 Q58 52 53 52 L43 52 Z" fill="#000000" />
+      <rect x="6" y="6" width="60" height="60" fill="#000000" />
+      <rect x="2" y="2" width="60" height="60" fill="#FFCC00" stroke="#000000" strokeWidth="4" />
+      <path d="M14 46 L22 12 L26 12 L20 46 Z" fill="#000000" />
+      <rect x="15" y="32" width="12" height="4" fill="#000000" />
+      <rect x="32" y="12" width="5" height="34" fill="#000000" />
+      <path d="M37 12 L46 12 Q51 12 51 19 Q51 26 46 26 L37 26 Z" fill="#000000" />
+      <path d="M37 26 L47 26 Q52 26 52 33 Q52 46 47 46 L37 46 Z" fill="#000000" />
     </svg>
   );
 }
@@ -238,40 +238,40 @@ export function Nav({
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-3 md:px-10">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3.5 md:px-10">
         <Link to="/" className="flex items-center gap-2 press">
-          <LogoFull className="h-9 w-auto" />
+          <LogoFull className="h-11 md:h-13 w-auto" />
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-2 lg:flex">
           <Link
             to="/dashboard"
-            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Dashboard
           </Link>
           <Link
             to="/history"
-            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             History
           </Link>
           <Link
             to="/leaderboard"
-            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Leaderboard
           </Link>
           <Link
             to="/settings"
-            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Settings
           </Link>
           <Link
             to="/docs"
-            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Docs
           </Link>
