@@ -29,6 +29,7 @@ function HistoryPage() {
   const store = useStore();
   const activeId = profileId ?? store.activeProfileId;
   const profile = getProfile(activeId);
+  const search = activeId ? { student: activeId } : undefined;
 
   const profileSubmissions = profile.days
     .filter((d) => d.status === "completed" && d.submission)
@@ -90,7 +91,6 @@ function HistoryPage() {
                 <Link
                   to="/day/$n"
                   params={{ n: String(sub.dayNumber) }}
-                  search={search as never}
                   className="flex flex-wrap items-start justify-between gap-2"
                 >
                   <div className="flex items-center gap-3">
@@ -141,7 +141,6 @@ function HistoryPage() {
                 key={`frozen-${d.dayNumber}`}
                 to="/day/$n"
                 params={{ n: String(d.dayNumber) }}
-                search={search as never}
                 className="block border-2 border-dashed border-blue bg-card-surface p-4 transition-all duration-150 hover:shadow-brutal-sm"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
