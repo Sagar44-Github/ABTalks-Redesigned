@@ -107,7 +107,7 @@ export function Panel({
   return (
     <section
       className={cn(
-        "rounded-card border-2 border-ink p-5 shadow-brutal",
+        "min-w-0 rounded-card border-2 border-ink p-5 shadow-brutal",
         tones[tone],
         className,
       )}
