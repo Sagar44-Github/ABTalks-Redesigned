@@ -357,24 +357,24 @@ export function Nav({
             <div className="mt-2 border-t border-muted-ink/20 pt-2">
               <MonoLabel>Demo profiles</MonoLabel>
               <Link
-                to="/u/$username"
-                params={{ username: "riya-nandan" }}
+                to="/dashboard"
+                search={{ student: "mid" }}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
               >
                 Riya (mid-challenge)
               </Link>
               <Link
-                to="/u/$username"
-                params={{ username: "arjun-mehta" }}
+                to="/dashboard"
+                search={{ student: "first-day" }}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
               >
                 Arjun (day one)
               </Link>
               <Link
-                to="/u/$username"
-                params={{ username: "sana-qureshi" }}
+                to="/dashboard"
+                search={{ student: "empty" }}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
               >
@@ -436,9 +436,9 @@ export function Footer() {
           <div>
             <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Demo profiles</p>
             <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
-              <Link to="/u/$username" params={{ username: "riya-nandan" }} className="hover:text-yellow">Riya Nandan (mid-challenge)</Link>
-              <Link to="/u/$username" params={{ username: "arjun-mehta" }} className="hover:text-yellow">Arjun Mehta (day one)</Link>
-              <Link to="/u/$username" params={{ username: "sana-qureshi" }} className="hover:text-yellow">Sana Qureshi (empty)</Link>
+              <Link to="/dashboard" search={{ student: "mid" }} className="hover:text-yellow">Riya Nandan (mid-challenge)</Link>
+              <Link to="/dashboard" search={{ student: "first-day" }} className="hover:text-yellow">Arjun Mehta (day one)</Link>
+              <Link to="/dashboard" search={{ student: "empty" }} className="hover:text-yellow">Sana Qureshi (empty)</Link>
             </nav>
           </div>
         </div>

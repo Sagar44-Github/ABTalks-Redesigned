@@ -289,9 +289,8 @@ function DaySearch({
 function Dashboard() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
-  const activeId = profileId ?? store.activeProfileId;
-  const profile = getProfile(activeId);
-  const search = activeId ? { student: activeId } : undefined;
+  const profile = getProfile(profileId);
+  const search = profileId ? { student: profileId } : undefined;
 
   // No redirect — default to web-dev if no track selected (better for demos/evaluators)
   const trackId = store.selectedTrackId ?? profile.student.selectedTrackId ?? "web-dev";
@@ -336,7 +335,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={student} cta={false} />
+      <Nav student={student} cta={false} searchState={search} />
 
       {/* Milestone celebration */}
       {activeMilestone && (
@@ -364,12 +363,12 @@ function Dashboard() {
             </span>
             <div className="inline-flex border-2 border-ink bg-card-surface p-0.5 shadow-brutal-sm">
               {profileList.map((p) => {
-                const active = p.id === activeId;
+                const active = p.id === (profileId ?? "mid");
                 return (
-                  <button
+                  <Link
                     key={p.id}
-                    type="button"
-                    onClick={() => store.switchProfile(p.id)}
+                    to="/dashboard"
+                    search={{ student: p.id }}
                     className={cn(
                       "px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-all",
                       active
@@ -378,7 +377,7 @@ function Dashboard() {
                     )}
                   >
                     {p.label}
-                  </button>
+                  </Link>
                 );
               })}
             </div>
