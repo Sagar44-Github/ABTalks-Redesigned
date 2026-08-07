@@ -40,6 +40,43 @@ export type Student = {
   totalDaysCompleted: number;
   completionPercentage: number;
   streakState: "alive" | "at-risk" | "broken" | "not-started";
+  username: string;
+  isPublic: boolean;
+  selectedTrackId: string | null;
+  seenMilestones: number[];
+  notificationPrefs: {
+    eveningReminder: boolean;
+  };
+};
+
+export type Track = {
+  id: string;
+  name: string;
+  description: string;
+  totalStudents: number;
+  exampleTasks: string[];
+  challengeDays: Omit<ChallengeDay, "status" | "submission">[];
+};
+
+export type SubmissionRecord = {
+  dayNumber: number;
+  trackId: string;
+  taskTitle: string;
+  submittedAt: string;
+  githubUrl: string;
+  linkedinUrl: string;
+  status: DayStatus;
+};
+
+export type LeaderboardEntry = {
+  rank: number;
+  username: string;
+  name: string;
+  avatarUrl: string;
+  initials: string;
+  trackId: string;
+  currentStreak: number;
+  completionPercentage: number;
 };
 
 export type Profile = {
@@ -53,42 +90,13 @@ export type Profile = {
 
 export type ProfileId = "mid" | "first-day" | "empty";
 
-export const tracks = [
-  {
-    id: "web-dev",
-    name: "Web Dev",
-    description: "Ship a real app: React, APIs, auth, deploys.",
-    totalStudents: 1284,
-  },
-  {
-    id: "ai-ml",
-    name: "AI / ML",
-    description: "From NumPy to a deployed model endpoint.",
-    totalStudents: 742,
-  },
-  {
-    id: "dsa",
-    name: "DSA",
-    description: "60 days of patterns, not 600 random problems.",
-    totalStudents: 968,
-  },
-  {
-    id: "mobile",
-    name: "Mobile",
-    description: "One React Native app, built screen by screen.",
-    totalStudents: 411,
-  },
-  {
-    id: "backend",
-    name: "Backend",
-    description: "APIs, databases, queues, and the ops around them.",
-    totalStudents: 553,
-  },
-];
+export type MockTimeOfDay = "day" | "evening" | "late-night";
+
+/* ── Curriculum: Web Dev (60 days) ── */
 
 type DaySeed = { title: string; description: string; objectives: string[] };
 
-const curriculum: DaySeed[] = [
+const webDevCurriculum: DaySeed[] = [
   {
     title: "Set up your build environment",
     description:
@@ -158,7 +166,7 @@ const curriculum: DaySeed[] = [
   {
     title: "Build a reusable component library",
     description:
-      "Extract Button, Input, Card, and Badge into a small internal library with variants driven by props. Document each variant in a demo route so future-you can see everything at once.",
+      "Extract Button, Input, Card, and Badge into a small internal library with variants driven by props. Document each variant in a demo route.",
     objectives: [
       "Variant-driven component APIs",
       "Composition over configuration",
@@ -455,6 +463,463 @@ const curriculum: DaySeed[] = [
   },
 ];
 
+/* ── Curriculum: AI / ML (60 days) ── */
+
+const aiMlCurriculum: DaySeed[] = [
+  {
+    title: "Python environment and Jupyter setup",
+    description:
+      "Install Python 3.11, create a virtual environment, install Jupyter Lab, and push your first notebook to a public GitHub repo.",
+    objectives: ["Virtual environment setup", "Jupyter Lab basics", "First commit pushed"],
+  },
+  {
+    title: "NumPy fundamentals",
+    description:
+      "Create, reshape, and slice arrays. Write five vectorised operations and compare speed against native Python loops.",
+    objectives: ["Array creation and shapes", "Broadcasting", "Vectorised operations"],
+  },
+  {
+    title: "Pandas data wrangling",
+    description:
+      "Load a CSV into a DataFrame, clean missing values, filter rows, and compute group-level aggregates. No Excel allowed.",
+    objectives: ["DataFrame indexing", "Handling nulls", "GroupBy aggregates"],
+  },
+  {
+    title: "Data visualisation with Matplotlib",
+    description:
+      "Plot three chart types — line, bar, scatter — from a real dataset. Label every axis and add a title that tells a story.",
+    objectives: ["Plot types", "Axis labelling", "Figure composition"],
+  },
+  {
+    title: "Exploratory data analysis",
+    description:
+      "Pick a Kaggle dataset and produce a full EDA notebook: distributions, correlations, outliers, and three written insights.",
+    objectives: ["Distribution analysis", "Correlation matrices", "Insight writing"],
+  },
+  {
+    title: "Statistics for ML",
+    description:
+      "Compute mean, median, standard deviation, and percentiles by hand, then verify with NumPy. Understand when each matters.",
+    objectives: ["Descriptive statistics", "Variance and std dev", "Percentile interpretation"],
+  },
+  {
+    title: "Probability and Bayes' theorem",
+    description:
+      "Solve three probability problems from scratch. Implement a naive Bayesian spam classifier on a tiny dataset.",
+    objectives: ["Conditional probability", "Bayes' theorem", "Prior vs posterior"],
+  },
+  {
+    title: "Linear algebra essentials",
+    description:
+      "Multiply matrices, compute dot products, and find eigenvalues using NumPy. Understand why ML frameworks think in tensors.",
+    objectives: ["Matrix operations", "Dot products", "Eigenvalues intuition"],
+  },
+  {
+    title: "Linear regression from scratch",
+    description:
+      "Implement gradient descent for simple linear regression without scikit-learn. Plot the loss curve and the fit line.",
+    objectives: ["Cost function", "Gradient descent", "Convergence plotting"],
+  },
+  {
+    title: "Linear regression with scikit-learn",
+    description:
+      "Reimplement yesterday's model using scikit-learn's API. Add train/test split and evaluate with MSE and R².",
+    objectives: ["Scikit-learn API", "Train/test split", "Evaluation metrics"],
+  },
+  {
+    title: "Polynomial and regularised regression",
+    description:
+      "Fit polynomial features and show overfitting. Apply Ridge and Lasso to tame it. Compare coefficients before and after.",
+    objectives: ["Polynomial features", "Ridge vs Lasso", "Regularisation effect"],
+  },
+  {
+    title: "Logistic regression",
+    description:
+      "Build a binary classifier for a tabular dataset. Plot the decision boundary and compute precision, recall, and F1.",
+    objectives: ["Sigmoid function", "Decision boundary", "Classification metrics"],
+  },
+  {
+    title: "Decision trees",
+    description:
+      "Train a decision tree, visualise it, and interpret the splits. Identify where it overfits and try max_depth limits.",
+    objectives: ["Tree visualisation", "Overfitting detection", "Hyperparameter tuning"],
+  },
+  {
+    title: "Random forests and ensembles",
+    description:
+      "Compare a single tree to a random forest on the same data. Show that bagging reduces variance with a concrete metric.",
+    objectives: ["Bagging", "Feature importance", "Variance reduction"],
+  },
+  {
+    title: "Support vector machines",
+    description:
+      "Train an SVM with different kernels. Visualise the margin and support vectors on a 2D dataset.",
+    objectives: ["Kernel trick", "Margin and support vectors", "Kernel comparison"],
+  },
+  {
+    title: "K-nearest neighbours",
+    description:
+      "Implement KNN from scratch, then with scikit-learn. Show how K choice affects the decision boundary.",
+    objectives: ["Distance metrics", "K selection", "Bias-variance with K"],
+  },
+  {
+    title: "Clustering with K-Means",
+    description:
+      "Cluster a dataset with K-Means. Use the elbow method and silhouette score to pick K. Visualise cluster assignments.",
+    objectives: ["K-Means algorithm", "Elbow method", "Silhouette score"],
+  },
+  {
+    title: "Dimensionality reduction with PCA",
+    description:
+      "Reduce a high-dimensional dataset to 2D with PCA. Show explained variance and interpret the principal components.",
+    objectives: ["PCA intuition", "Explained variance", "Component interpretation"],
+  },
+  {
+    title: "Feature engineering",
+    description:
+      "Create five meaningful features from raw data. Show how each one improves (or doesn't) model performance.",
+    objectives: ["Feature creation", "Domain knowledge", "Performance impact"],
+  },
+  {
+    title: "Cross-validation and model selection",
+    description:
+      "Run k-fold cross-validation on three models and pick the best one. Explain why a single train/test split isn't enough.",
+    objectives: ["K-fold CV", "Model comparison", "Overfitting detection"],
+  },
+  {
+    title: "Hyperparameter tuning with GridSearch",
+    description:
+      "Use GridSearchCV to tune a random forest. Compare grid search vs random search on computation time and result quality.",
+    objectives: ["GridSearchCV", "RandomizedSearchCV", "Search space design"],
+  },
+  {
+    title: "Handling imbalanced datasets",
+    description:
+      "Train a model on an imbalanced dataset and watch it fail. Apply SMOTE, class weights, and threshold tuning to fix it.",
+    objectives: ["Class imbalance", "SMOTE", "Threshold tuning"],
+  },
+  {
+    title: "Pipelines and reproducibility",
+    description:
+      "Build a scikit-learn Pipeline that chains preprocessing and modelling. Make your workflow reproducible end to end.",
+    objectives: ["Pipeline API", "ColumnTransformer", "Reproducibility"],
+  },
+  {
+    title: "Introduction to neural networks",
+    description:
+      "Build a single-layer perceptron from scratch in NumPy. Train it on a linearly separable 2D dataset and plot the boundary.",
+    objectives: ["Perceptron", "Activation functions", "Forward pass"],
+  },
+  {
+    title: "Multi-layer networks and backprop",
+    description:
+      "Add a hidden layer to your perceptron. Implement backpropagation by hand and verify gradients numerically.",
+    objectives: ["Backpropagation", "Chain rule", "Gradient checking"],
+  },
+  {
+    title: "PyTorch fundamentals",
+    description:
+      "Install PyTorch and rewrite your NumPy neural net using tensors and autograd. Compare training speed on CPU.",
+    objectives: ["Tensors", "Autograd", "Training loop"],
+  },
+  {
+    title: "Building a PyTorch classifier",
+    description:
+      "Train a 3-layer network on a tabular dataset using PyTorch. Use DataLoaders, proper batching, and a validation set.",
+    objectives: ["nn.Module", "DataLoader", "Validation loop"],
+  },
+  {
+    title: "Convolutional neural networks",
+    description:
+      "Build a CNN for image classification on MNIST or Fashion-MNIST. Visualise learned filters from the first conv layer.",
+    objectives: ["Conv layers", "Pooling", "Filter visualisation"],
+  },
+  {
+    title: "Transfer learning with a pretrained model",
+    description:
+      "Fine-tune a pretrained ResNet on a small custom dataset. Show that transfer learning beats training from scratch.",
+    objectives: ["Pretrained models", "Fine-tuning", "Feature extraction"],
+  },
+  {
+    title: "Recurrent neural networks",
+    description:
+      "Build an LSTM for sequence prediction — next character or next word. Train on a small text corpus and generate samples.",
+    objectives: ["LSTM architecture", "Sequence modelling", "Text generation"],
+  },
+  {
+    title: "Halfway checkpoint: model review",
+    description:
+      "No new models today. Review your notebooks, clean code, add markdown explanations, and organise your repo.",
+    objectives: ["Notebook hygiene", "Documentation", "Repo organisation"],
+  },
+  {
+    title: "Natural language processing basics",
+    description:
+      "Tokenise, stem, and vectorise a text dataset. Build a TF-IDF based document classifier.",
+    objectives: ["Tokenisation", "TF-IDF", "Text classification"],
+  },
+  {
+    title: "Word embeddings",
+    description:
+      "Train Word2Vec on a corpus and explore the embedding space. Find analogies and visualise with t-SNE.",
+    objectives: ["Word2Vec", "Embedding space", "t-SNE visualisation"],
+  },
+  {
+    title: "Transformers and attention",
+    description:
+      "Understand the attention mechanism conceptually. Use Hugging Face transformers for sentiment classification out of the box.",
+    objectives: ["Attention mechanism", "Hugging Face pipeline", "Sentiment analysis"],
+  },
+  {
+    title: "Fine-tuning a language model",
+    description:
+      "Fine-tune a DistilBERT model on a custom text classification task. Evaluate on a held-out test set.",
+    objectives: ["Model fine-tuning", "DistilBERT", "Custom classification"],
+  },
+  {
+    title: "Generative AI: prompt engineering",
+    description:
+      "Experiment with an LLM API. Write five prompt patterns (few-shot, chain-of-thought, etc.) and compare output quality.",
+    objectives: ["Prompt patterns", "Few-shot learning", "Output evaluation"],
+  },
+  {
+    title: "Building a RAG pipeline",
+    description:
+      "Implement retrieval-augmented generation: chunk documents, embed them, retrieve relevant context, and generate answers.",
+    objectives: ["Document chunking", "Vector search", "Context injection"],
+  },
+  {
+    title: "Image classification project",
+    description:
+      "Build an end-to-end image classifier: data loading, augmentation, training, evaluation, and a prediction function.",
+    objectives: ["Data augmentation", "Training pipeline", "Prediction API"],
+  },
+  {
+    title: "Object detection overview",
+    description:
+      "Use a pretrained YOLO or SSD model to detect objects in images. Understand bounding boxes, IoU, and mAP.",
+    objectives: ["Bounding boxes", "IoU metric", "Pretrained detection"],
+  },
+  {
+    title: "Time series forecasting",
+    description:
+      "Build an ARIMA model and a simple LSTM for time series. Compare their forecasts on a real-world dataset.",
+    objectives: ["ARIMA", "LSTM for sequences", "Forecast evaluation"],
+  },
+  {
+    title: "Recommendation systems",
+    description:
+      "Build a collaborative filtering recommender using matrix factorisation. Evaluate with precision@k.",
+    objectives: ["Collaborative filtering", "Matrix factorisation", "Evaluation metrics"],
+  },
+  {
+    title: "Anomaly detection",
+    description:
+      "Detect outliers in a dataset using Isolation Forest and autoencoders. Compare results and explain trade-offs.",
+    objectives: ["Isolation Forest", "Autoencoder", "Anomaly scoring"],
+  },
+  {
+    title: "Reinforcement learning basics",
+    description:
+      "Implement Q-learning for a simple grid world. Watch the agent learn a policy over episodes.",
+    objectives: ["Q-table", "Exploration vs exploitation", "Policy convergence"],
+  },
+  {
+    title: "Model interpretability",
+    description:
+      "Use SHAP values and LIME to explain predictions from a black-box model. Communicate findings to a non-technical audience.",
+    objectives: ["SHAP values", "LIME explanations", "Stakeholder communication"],
+  },
+  {
+    title: "ML experiment tracking",
+    description:
+      "Set up MLflow or Weights & Biases to track experiments. Log hyperparameters, metrics, and model artifacts.",
+    objectives: ["Experiment tracking", "Metric logging", "Artifact storage"],
+  },
+  {
+    title: "Data versioning",
+    description:
+      "Use DVC or a similar tool to version your datasets. Ensure any collaborator can reproduce your results.",
+    objectives: ["Data versioning", "Reproducibility", "Collaboration"],
+  },
+  {
+    title: "Model serialisation and serving",
+    description:
+      "Save your best model with joblib/pickle and load it in a Flask/FastAPI endpoint. Serve predictions via HTTP.",
+    objectives: ["Model serialisation", "API endpoint", "Prediction serving"],
+  },
+  {
+    title: "Containerising your ML app",
+    description:
+      "Write a Dockerfile for your model API. Build and run the container locally. Test the endpoint from outside.",
+    objectives: ["Docker basics", "Container build", "API testing"],
+  },
+  {
+    title: "Cloud deployment",
+    description:
+      "Deploy your containerised model to a cloud platform. Make the prediction endpoint publicly accessible.",
+    objectives: ["Cloud deployment", "Environment config", "Public endpoint"],
+  },
+  {
+    title: "Model monitoring",
+    description:
+      "Add basic monitoring to your deployed model: input distribution tracking, prediction latency, and error rates.",
+    objectives: ["Input monitoring", "Latency tracking", "Drift detection"],
+  },
+  {
+    title: "Ethics and bias in ML",
+    description:
+      "Audit a model for bias across demographic groups. Document findings and propose at least one mitigation strategy.",
+    objectives: ["Bias auditing", "Fairness metrics", "Mitigation strategies"],
+  },
+  {
+    title: "Responsible AI practices",
+    description:
+      "Write a model card for your best model: intended use, limitations, evaluation data, and ethical considerations.",
+    objectives: ["Model cards", "Documentation", "Ethical review"],
+  },
+  {
+    title: "Advanced PyTorch: custom datasets",
+    description:
+      "Build a custom Dataset class for a non-standard data format. Handle lazy loading and on-the-fly transforms.",
+    objectives: ["Custom Dataset", "Lazy loading", "Transform pipeline"],
+  },
+  {
+    title: "Mixed precision and performance",
+    description:
+      "Enable mixed precision training and measure the speedup. Profile your training loop and eliminate bottlenecks.",
+    objectives: ["Mixed precision", "Profiling", "Bottleneck analysis"],
+  },
+  {
+    title: "Capstone project: day 1 of 3",
+    description:
+      "Choose a real-world problem, find a dataset, and define your approach. Write a project proposal with clear success metrics.",
+    objectives: ["Problem definition", "Dataset selection", "Success metrics"],
+  },
+  {
+    title: "Capstone project: day 2 of 3",
+    description:
+      "Build, train, and evaluate your model. Document every decision and result in a clean notebook.",
+    objectives: ["Model building", "Evaluation", "Documentation"],
+  },
+  {
+    title: "Capstone project: day 3 of 3",
+    description:
+      "Deploy your capstone model, write the README, and create a demo video or live endpoint. Make it recruiter-ready.",
+    objectives: ["Deployment", "README", "Demo creation"],
+  },
+  {
+    title: "Portfolio and GitHub cleanup",
+    description:
+      "Pin your best repos, write clear descriptions, clean commit history, and craft a profile README that tells your ML story.",
+    objectives: ["Repo hygiene", "Profile README", "Signal over noise"],
+  },
+  {
+    title: "Mock interview walkthrough",
+    description:
+      "Record yourself explaining your capstone: problem, data, model choice, hardest bug, and what you'd do with more time.",
+    objectives: ["Technical storytelling", "Architecture recall", "Self-critique"],
+  },
+  {
+    title: "Ship and reflect",
+    description:
+      "Final deploy, final post. Write what changed in your understanding of ML over 60 days — the habit is the deliverable.",
+    objectives: ["Final deploy", "Retrospective", "Next 60 days plan"],
+  },
+];
+
+/* ── Track definitions ── */
+
+function buildTrackDays(
+  curriculum: DaySeed[],
+  trackName: string,
+): Omit<ChallengeDay, "status" | "submission">[] {
+  return curriculum.map((seed, i) => {
+    const dayNumber = i + 1;
+    return {
+      dayNumber,
+      title: seed.title,
+      description: seed.description,
+      learningObjectives: seed.objectives,
+      track: trackName,
+      estimatedTime: dayNumber % 7 === 0 ? "2–3 hrs" : "60–90 min",
+      difficulty: (dayNumber <= 10 ? "Starter" : dayNumber <= 45 ? "Core" : "Stretch") as
+        | "Starter"
+        | "Core"
+        | "Stretch",
+    };
+  });
+}
+
+export const tracks: Track[] = [
+  {
+    id: "web-dev",
+    name: "Web Dev",
+    description: "Ship a real app: React, APIs, auth, deploys.",
+    totalStudents: 1284,
+    exampleTasks: [
+      "Build a semantic HTML profile card",
+      "Flexbox layout gauntlet",
+      "State with useState",
+    ],
+    challengeDays: buildTrackDays(webDevCurriculum, "Web Dev"),
+  },
+  {
+    id: "ai-ml",
+    name: "AI / ML",
+    description: "From NumPy to a deployed model endpoint.",
+    totalStudents: 742,
+    exampleTasks: [
+      "Linear regression from scratch",
+      "Build a CNN for image classification",
+      "Fine-tune a language model",
+    ],
+    challengeDays: buildTrackDays(aiMlCurriculum, "AI / ML"),
+  },
+  {
+    id: "dsa",
+    name: "DSA",
+    description: "60 days of patterns, not 600 random problems.",
+    totalStudents: 968,
+    exampleTasks: [
+      "Two pointer techniques",
+      "Binary search variants",
+      "Dynamic programming fundamentals",
+    ],
+    challengeDays: buildTrackDays(webDevCurriculum, "DSA"), // reuse web dev as placeholder
+  },
+  {
+    id: "mobile",
+    name: "Mobile",
+    description: "One React Native app, built screen by screen.",
+    totalStudents: 411,
+    exampleTasks: [
+      "React Native setup and first screen",
+      "Navigation and tab bars",
+      "Native device APIs",
+    ],
+    challengeDays: buildTrackDays(webDevCurriculum, "Mobile"),
+  },
+  {
+    id: "backend",
+    name: "Backend",
+    description: "APIs, databases, queues, and the ops around them.",
+    totalStudents: 553,
+    exampleTasks: [
+      "REST API design and Express",
+      "Database schema design",
+      "Authentication and sessions",
+    ],
+    challengeDays: buildTrackDays(webDevCurriculum, "Backend"),
+  },
+];
+
+export function getTrack(trackId: string): Track {
+  return tracks.find((t) => t.id === trackId) ?? tracks[0]!;
+}
+
+/* ── Caption helper ── */
+
 export function captionFor(day: number, title: string, objectives: string[]) {
   return `Day ${day} of my #ABTalks60DayChallenge 🚀
 
@@ -469,51 +934,49 @@ Commit pushed, day logged. ${60 - day} to go.
 #100DaysOfCode #BuildInPublic #ABTalks`;
 }
 
-const TRACK = "Web Dev";
+/* ── Profile builder helpers ── */
 
-function baseDay(index: number): Omit<ChallengeDay, "status" | "submission"> {
-  const seed = curriculum[index]!;
-  const dayNumber = index + 1;
-  return {
-    dayNumber,
-    title: seed.title,
-    description: seed.description,
-    learningObjectives: seed.objectives,
-    track: TRACK,
-    estimatedTime: dayNumber % 7 === 0 ? "2–3 hrs" : "60–90 min",
-    difficulty: dayNumber <= 10 ? "Starter" : dayNumber <= 45 ? "Core" : "Stretch",
-  };
-}
-
-function submissionFor(day: Omit<ChallengeDay, "status" | "submission">): Submission {
+function submissionFor(
+  day: Omit<ChallengeDay, "status" | "submission">,
+  username: string,
+): Submission {
   const iso = new Date(Date.UTC(2026, 5, 1 + day.dayNumber, 21, 40)).toISOString();
   return {
-    githubUrl: `https://github.com/riya-nandan/abtalks-60/commit/${(day.dayNumber * 918273).toString(16)}`,
-    linkedinUrl: `https://www.linkedin.com/posts/riya-nandan_abtalks60daychallenge-day${day.dayNumber}`,
+    githubUrl: `https://github.com/${username}/abtalks-60/commit/${(day.dayNumber * 918273).toString(16)}`,
+    linkedinUrl: `https://www.linkedin.com/posts/${username}_abtalks60daychallenge-day${day.dayNumber}`,
     linkedinCaption: captionFor(day.dayNumber, day.title, day.learningObjectives),
     submittedAt: iso,
   };
 }
 
-function buildDays(statusFor: (dayNumber: number) => DayStatus): ChallengeDay[] {
-  return curriculum.map((_, i) => {
-    const base = baseDay(i);
+function buildProfileDays(
+  trackId: string,
+  statusFor: (dayNumber: number) => DayStatus,
+  username: string,
+): ChallengeDay[] {
+  const track = getTrack(trackId);
+  return track.challengeDays.map((base) => {
     const status = statusFor(base.dayNumber);
     return {
       ...base,
       status,
-      submission: status === "completed" ? submissionFor(base) : null,
+      submission: status === "completed" ? submissionFor(base, username) : null,
     };
   });
 }
 
-/* Profile A — mid-challenge, one freeze-protected miss on day 6, today is day 12 */
-const midDays = buildDays((n) => {
-  if (n === 6) return "frozen";
-  if (n < 12) return "completed";
-  if (n === 12) return "today";
-  return "upcoming";
-});
+/* ── Profiles ── */
+
+const midDays = buildProfileDays(
+  "web-dev",
+  (n) => {
+    if (n === 6) return "frozen";
+    if (n < 12) return "completed";
+    if (n === 12) return "today";
+    return "upcoming";
+  },
+  "riya-nandan",
+);
 
 const midProfile: Profile = {
   id: "mid",
@@ -523,7 +986,7 @@ const midProfile: Profile = {
     name: "Riya Nandan",
     avatarUrl: "",
     initials: "RN",
-    track: TRACK,
+    track: "Web Dev",
     joinedDate: "2026-06-01",
     currentStreak: 11,
     longestStreak: 11,
@@ -532,6 +995,11 @@ const midProfile: Profile = {
     totalDaysCompleted: 11,
     completionPercentage: 18,
     streakState: "at-risk",
+    username: "riya-nandan",
+    isPublic: true,
+    selectedTrackId: "web-dev",
+    seenMilestones: [7],
+    notificationPrefs: { eveningReminder: true },
   },
   days: midDays,
   achievements: [
@@ -573,7 +1041,6 @@ const midProfile: Profile = {
   ],
 };
 
-/* Profile B — first day, nothing submitted yet, streak 0 */
 const firstDayProfile: Profile = {
   id: "first-day",
   label: "Day one",
@@ -582,7 +1049,7 @@ const firstDayProfile: Profile = {
     name: "Arjun Mehta",
     avatarUrl: "",
     initials: "AM",
-    track: TRACK,
+    track: "Web Dev",
     joinedDate: "2026-08-07",
     currentStreak: 0,
     longestStreak: 0,
@@ -591,8 +1058,13 @@ const firstDayProfile: Profile = {
     totalDaysCompleted: 0,
     completionPercentage: 0,
     streakState: "not-started",
+    username: "arjun-mehta",
+    isPublic: true,
+    selectedTrackId: "web-dev",
+    seenMilestones: [],
+    notificationPrefs: { eveningReminder: false },
   },
-  days: buildDays((n) => (n === 1 ? "today" : "upcoming")),
+  days: buildProfileDays("web-dev", (n) => (n === 1 ? "today" : "upcoming"), "arjun-mehta"),
   achievements: [
     {
       id: "first-submission",
@@ -618,7 +1090,6 @@ const firstDayProfile: Profile = {
   ],
 };
 
-/* Profile C — enrolled a while ago, never submitted anything: broken streak, real gaps */
 const emptyProfile: Profile = {
   id: "empty",
   label: "Empty profile",
@@ -627,7 +1098,7 @@ const emptyProfile: Profile = {
     name: "Sana Qureshi",
     avatarUrl: "",
     initials: "SQ",
-    track: TRACK,
+    track: "Web Dev",
     joinedDate: "2026-07-20",
     currentStreak: 0,
     longestStreak: 0,
@@ -636,12 +1107,21 @@ const emptyProfile: Profile = {
     totalDaysCompleted: 0,
     completionPercentage: 0,
     streakState: "broken",
+    username: "sana-qureshi",
+    isPublic: false,
+    selectedTrackId: "web-dev",
+    seenMilestones: [],
+    notificationPrefs: { eveningReminder: false },
   },
-  days: buildDays((n) => {
-    if (n < 12) return "missed";
-    if (n === 12) return "today";
-    return "upcoming";
-  }),
+  days: buildProfileDays(
+    "web-dev",
+    (n) => {
+      if (n < 12) return "missed";
+      if (n === 12) return "today";
+      return "upcoming";
+    },
+    "sana-qureshi",
+  ),
   achievements: [
     {
       id: "first-submission",
@@ -686,3 +1166,28 @@ export const platformStats = {
   collegesRepresented: 312,
   finishRate: 41,
 };
+
+/* ── Leaderboard mock data ── */
+
+export const leaderboardData: LeaderboardEntry[] = [
+  { rank: 1, username: "priya-sharma", name: "Priya Sharma", avatarUrl: "", initials: "PS", trackId: "web-dev", currentStreak: 58, completionPercentage: 97 },
+  { rank: 2, username: "vikram-singh", name: "Vikram Singh", avatarUrl: "", initials: "VS", trackId: "ai-ml", currentStreak: 55, completionPercentage: 92 },
+  { rank: 3, username: "ananya-iyer", name: "Ananya Iyer", avatarUrl: "", initials: "AI", trackId: "web-dev", currentStreak: 52, completionPercentage: 87 },
+  { rank: 4, username: "rohit-kumar", name: "Rohit Kumar", avatarUrl: "", initials: "RK", trackId: "dsa", currentStreak: 48, completionPercentage: 80 },
+  { rank: 5, username: "meera-patel", name: "Meera Patel", avatarUrl: "", initials: "MP", trackId: "ai-ml", currentStreak: 45, completionPercentage: 75 },
+  { rank: 6, username: "aditya-joshi", name: "Aditya Joshi", avatarUrl: "", initials: "AJ", trackId: "backend", currentStreak: 42, completionPercentage: 70 },
+  { rank: 7, username: "sneha-reddy", name: "Sneha Reddy", avatarUrl: "", initials: "SR", trackId: "web-dev", currentStreak: 39, completionPercentage: 65 },
+  { rank: 8, username: "karan-gupta", name: "Karan Gupta", avatarUrl: "", initials: "KG", trackId: "mobile", currentStreak: 36, completionPercentage: 60 },
+  { rank: 9, username: "divya-nair", name: "Divya Nair", avatarUrl: "", initials: "DN", trackId: "ai-ml", currentStreak: 33, completionPercentage: 55 },
+  { rank: 10, username: "arjun-das", name: "Arjun Das", avatarUrl: "", initials: "AD", trackId: "dsa", currentStreak: 30, completionPercentage: 50 },
+  { rank: 11, username: "riya-nandan", name: "Riya Nandan", avatarUrl: "", initials: "RN", trackId: "web-dev", currentStreak: 11, completionPercentage: 18 },
+  { rank: 12, username: "harsh-verma", name: "Harsh Verma", avatarUrl: "", initials: "HV", trackId: "backend", currentStreak: 27, completionPercentage: 45 },
+  { rank: 13, username: "pooja-mishra", name: "Pooja Mishra", avatarUrl: "", initials: "PM", trackId: "web-dev", currentStreak: 24, completionPercentage: 40 },
+  { rank: 14, username: "nikhil-rao", name: "Nikhil Rao", avatarUrl: "", initials: "NR", trackId: "ai-ml", currentStreak: 21, completionPercentage: 35 },
+  { rank: 15, username: "kavya-menon", name: "Kavya Menon", avatarUrl: "", initials: "KM", trackId: "mobile", currentStreak: 18, completionPercentage: 30 },
+  { rank: 16, username: "siddharth-b", name: "Siddharth Banerjee", avatarUrl: "", initials: "SB", trackId: "dsa", currentStreak: 15, completionPercentage: 25 },
+  { rank: 17, username: "lakshmi-kr", name: "Lakshmi Krishnan", avatarUrl: "", initials: "LK", trackId: "web-dev", currentStreak: 12, completionPercentage: 20 },
+  { rank: 18, username: "amit-t", name: "Amit Tiwari", avatarUrl: "", initials: "AT", trackId: "backend", currentStreak: 9, completionPercentage: 15 },
+  { rank: 19, username: "nisha-chand", name: "Nisha Chand", avatarUrl: "", initials: "NC", trackId: "ai-ml", currentStreak: 6, completionPercentage: 10 },
+  { rank: 20, username: "arjun-mehta", name: "Arjun Mehta", avatarUrl: "", initials: "AM", trackId: "web-dev", currentStreak: 0, completionPercentage: 0 },
+];

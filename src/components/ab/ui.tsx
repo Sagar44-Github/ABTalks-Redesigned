@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Moon, Sun, Snowflake } from "lucide-react";
+import { Moon, Sun, Snowflake, History, Trophy, FileText, Settings, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/theme";
 import type { ChallengeDay, DayStatus } from "@/data/abtalks";
+import { useState } from "react";
 
 export function MonoLabel({
   children,
@@ -169,35 +170,146 @@ export function Nav({
   cta?: boolean;
   searchState?: Record<string, string | undefined>;
 }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-3 md:px-10">
         <Link to="/" className="font-display text-subheading uppercase tracking-[-0.04em]">
           ABTALKS
         </Link>
+
+        {/* Desktop nav links */}
+        <nav className="hidden items-center gap-1 lg:flex">
+          <Link
+            to="/dashboard"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/history"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+          >
+            History
+          </Link>
+          <Link
+            to="/leaderboard"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+          >
+            Leaderboard
+          </Link>
+          <Link
+            to="/settings"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+          >
+            Settings
+          </Link>
+          <Link
+            to="/docs"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wide hover:text-blue"
+          >
+            Docs
+          </Link>
+        </nav>
+
         <div className="flex items-center gap-2">
           {student ? (
-            <div className="flex items-center gap-2 border-2 border-ink bg-card-surface px-2 py-1.5">
+            <Link
+              to="/u/$username"
+              params={{ username: student.name.toLowerCase().replace(/\s+/g, "-") }}
+              className="flex items-center gap-2 border-2 border-ink bg-card-surface px-2 py-1.5 press"
+            >
               <span className="flex h-7 w-7 items-center justify-center bg-blue font-display text-label-small text-on-blue">
                 {student.initials}
               </span>
               <span className="hidden font-display text-label-small uppercase sm:inline">
                 {student.name}
               </span>
-            </div>
+            </Link>
           ) : null}
           <ThemeToggle />
           {cta ? (
             <BrutalLink
-              to="/dashboard"
+              to="/onboarding"
               search={searchState}
-              className="px-3 py-2 text-label-small sm:px-5 sm:py-3 sm:text-label-bold"
+              className="hidden px-3 py-2 text-label-small sm:inline-flex sm:px-5 sm:py-3 sm:text-label-bold"
             >
               Start your streak
             </BrutalLink>
           ) : null}
+          {/* Mobile menu toggle */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-none border-2 border-ink bg-card-surface text-ink shadow-brutal-sm press lg:hidden"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={18} strokeWidth={3} /> : <Menu size={18} strokeWidth={3} />}
+          </button>
         </div>
       </div>
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <nav className="border-t-2 border-ink bg-sidebar-surface px-4 py-3 lg:hidden">
+          <div className="flex flex-col gap-1">
+            <Link
+              to="/dashboard"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/history"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <History size={14} strokeWidth={3} /> History
+            </Link>
+            <Link
+              to="/leaderboard"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <Trophy size={14} strokeWidth={3} /> Leaderboard
+            </Link>
+            <Link
+              to="/settings"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <Settings size={14} strokeWidth={3} /> Settings
+            </Link>
+            <Link
+              to="/docs"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <FileText size={14} strokeWidth={3} /> Docs
+            </Link>
+            <div className="mt-2 border-t border-muted-ink/20 pt-2">
+              <MonoLabel>Demo profiles</MonoLabel>
+              <Link
+                to="/u/$username"
+                params={{ username: "riya-nandan" }}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+              >
+                Riya (mid-challenge)
+              </Link>
+              <Link
+                to="/u/$username"
+                params={{ username: "arjun-mehta" }}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+              >
+                Arjun (day one)
+              </Link>
+            </div>
+          </div>
+        </nav>
+      )}
     </header>
   );
 }
@@ -210,13 +322,34 @@ export function Footer() {
         <p className="mt-3 max-w-md text-body opacity-80">
           60 days. One commit, one post, every day. Proof of work you can show a recruiter.
         </p>
-        <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 font-display text-label-small uppercase">
-          <Link to="/">Home</Link>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/day/$n" params={{ n: "12" }}>
-            Today&apos;s task
-          </Link>
-        </nav>
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          <div>
+            <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Product</p>
+            <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
+              <Link to="/" className="hover:text-yellow">Home</Link>
+              <Link to="/onboarding" className="hover:text-yellow">Pick a track</Link>
+              <Link to="/dashboard" className="hover:text-yellow">Dashboard</Link>
+              <Link to="/day/$n" params={{ n: "12" }} className="hover:text-yellow">Today&apos;s task</Link>
+            </nav>
+          </div>
+          <div>
+            <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Features</p>
+            <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
+              <Link to="/history" className="hover:text-yellow">History</Link>
+              <Link to="/leaderboard" className="hover:text-yellow">Leaderboard</Link>
+              <Link to="/settings" className="hover:text-yellow">Settings</Link>
+              <Link to="/docs" className="hover:text-yellow">Documentation</Link>
+            </nav>
+          </div>
+          <div>
+            <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Demo profiles</p>
+            <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
+              <Link to="/u/$username" params={{ username: "riya-nandan" }} className="hover:text-yellow">Riya Nandan (mid-challenge)</Link>
+              <Link to="/u/$username" params={{ username: "arjun-mehta" }} className="hover:text-yellow">Arjun Mehta (day one)</Link>
+              <Link to="/u/$username" params={{ username: "sana-qureshi" }} className="hover:text-yellow">Sana Qureshi (empty)</Link>
+            </nav>
+          </div>
+        </div>
         <p className="mt-8 font-mono mono-label uppercase tracking-[0.2em] opacity-60">
           Built for students in India · Mocked data · No accounts required
         </p>
@@ -252,7 +385,7 @@ export function DayGrid({
             title={`Day ${d.dayNumber} — ${d.status}`}
             aria-label={`Day ${d.dayNumber}, ${d.status}`}
             className={cn(
-              "flex aspect-square items-center justify-center border-2 font-mono mono-label",
+              "flex aspect-square items-center justify-center border-2 font-mono mono-label transition-all duration-150 hover:scale-110 hover:shadow-brutal-sm focus:scale-110 focus:shadow-brutal-sm",
               statusStyles[d.status],
               d.status === "frozen" && "text-blue",
               d.status === "upcoming" && "text-muted-ink",
@@ -292,3 +425,6 @@ export function FreezeCounter({ available }: { available: number }) {
     </div>
   );
 }
+
+/* ── Status styles export for reuse ── */
+export { statusStyles };

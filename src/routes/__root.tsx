@@ -12,6 +12,9 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { themeInitScript } from "../lib/theme";
+import { StoreProvider, useStore } from "../lib/store";
+import { Toast } from "../components/ab/toast";
+import { Check, Snowflake } from "lucide-react";
 
 function NotFoundComponent() {
   return (
@@ -73,41 +76,44 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ABTalks — 60-Day Proof-of-Work Challenge" },
-      {
-        name: "description",
-        content:
-          "Pick a track. Build daily. Prove it with a commit and a LinkedIn post. A 60-day coding challenge for Indian college students.",
-      },
-      { property: "og:site_name", content: "ABTalks" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@700&display=swap",
-      },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-    ],
-    scripts: [{ children: themeInitScript }],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: "ABTalks — 60-Day Proof-of-Work Challenge" },
+        {
+          name: "description",
+          content:
+            "Pick a track. Build daily. Prove it with a commit and a LinkedIn post. A 60-day coding challenge for Indian college students.",
+        },
+        { property: "og:site_name", content: "ABTalks" },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        {
+          rel: "stylesheet",
+          href: appCss,
+        },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@700&display=swap",
+        },
+        { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+        { rel: "manifest", href: "/manifest.json" },
+      ],
+      scripts: [{ children: themeInitScript }],
+    }),
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  },
+);
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -123,13 +129,37 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function ToastContainer() {
+  const { toastMessage, clearToast } = useStore();
+  if (!toastMessage) return null;
+
+  const isFreezeMessage = toastMessage.toLowerCase().includes("freeze");
+
+  return (
+    <Toast
+      message={toastMessage}
+      onClose={clearToast}
+      icon={
+        isFreezeMessage ? (
+          <Snowflake size={16} strokeWidth={3} className="text-blue" />
+        ) : (
+          <Check size={16} strokeWidth={3} className="text-blue" />
+        )
+      }
+    />
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <StoreProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <ToastContainer />
+      </StoreProvider>
     </QueryClientProvider>
   );
 }

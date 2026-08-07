@@ -1,6 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Flame, Lock, Snowflake, Users } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
+  ArrowRight,
+  Flame,
+  Lock,
+  Search,
+  Snowflake,
+  Users,
+  X,
+  Sparkles,
+  Filter,
+} from "lucide-react";
+import {
+  BrutalButton,
   BrutalLink,
   DayGrid,
   Footer,
@@ -10,7 +22,10 @@ import {
   Panel,
   Pill,
 } from "@/components/ab/ui";
-import { getProfile, profileList, type ProfileId } from "@/data/abtalks";
+import { getProfile, getTrack, profileList, type ChallengeDay, type ProfileId } from "@/data/abtalks";
+import { useStore, resolvedDayStatus } from "@/lib/store";
+import { NudgeBanner } from "@/components/ab/nudge-banner";
+import { cn } from "@/lib/utils";
 
 type DashSearch = { student?: ProfileId };
 
@@ -49,8 +64,16 @@ function StreakBlock({
 }) {
   const config = {
     alive: { tone: "text-blue", label: "Streak alive", pill: "blue" as const },
-    "at-risk": { tone: "text-yellow", label: "At risk — today not submitted", pill: "yellow" as const },
-    broken: { tone: "text-red", label: "Streak broken — restart today", pill: "red" as const },
+    "at-risk": {
+      tone: "text-yellow",
+      label: "At risk — today not submitted",
+      pill: "yellow" as const,
+    },
+    broken: {
+      tone: "text-red",
+      label: "Streak broken — restart today",
+      pill: "red" as const,
+    },
     "not-started": { tone: "text-ink", label: "Not started yet", pill: "ink" as const },
   }[state];
 
@@ -60,7 +83,9 @@ function StreakBlock({
         <Flame size={16} strokeWidth={3} className={config.tone} />
         <MonoLabel>Current streak</MonoLabel>
       </div>
-      <p className={`mt-2 font-display text-streak-clamp tabular-nums ${config.tone}`}>{streak}</p>
+      <p className={`mt-2 font-display text-streak-clamp tabular-nums ${config.tone}`}>
+        {streak}
+      </p>
       <div className="mt-3">
         <Pill tone={config.pill}>{config.label}</Pill>
       </div>
@@ -68,19 +93,265 @@ function StreakBlock({
   );
 }
 
+/* ── Milestone Banner ── */
+function MilestoneBanner({
+  dayNumber,
+  onDismiss,
+}: {
+  dayNumber: number;
+  onDismiss: () => void;
+}) {
+  const messages: Record<number, { title: string; sub: string }> = {
+    7: {
+      title: "7 days straight.",
+      sub: "You're building a habit. Most people quit by now — you didn't.",
+    },
+    30: {
+      title: "Halfway there.",
+      sub: "30 days of proof. You're not a student with a resume anymore — you're a builder with receipts.",
+    },
+    60: {
+      title: "60 days. Done.",
+      sub: "You finished the entire challenge. 60 commits, 60 posts, zero excuses. This is the proof.",
+    },
+  };
+  const msg = messages[dayNumber];
+  if (!msg) return null;
+
+  const isDay60 = dayNumber === 60;
+
+  return (
+    <div
+      className={cn(
+        "border-b-2 border-ink",
+        isDay60
+          ? "bg-yellow text-on-yellow py-10 md:py-16"
+          : "bg-yellow text-on-yellow py-5 md:py-8",
+      )}
+    >
+      <div className="mx-auto max-w-[1440px] px-4 md:px-10">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sparkles
+                size={isDay60 ? 24 : 18}
+                strokeWidth={3}
+              />
+              <MonoLabel className="text-on-yellow/70">
+                MILESTONE · DAY {dayNumber}
+              </MonoLabel>
+            </div>
+            <h2
+              className={cn(
+                "mt-3 font-display uppercase",
+                isDay60 ? "text-heading-1 md:text-display-large" : "text-heading-2 md:text-heading-1",
+              )}
+            >
+              {msg.title}
+            </h2>
+            <p
+              className={cn(
+                "mt-3 max-w-xl",
+                isDay60 ? "text-body text-heading-3 font-display uppercase" : "text-body",
+              )}
+            >
+              {msg.sub}
+            </p>
+          </div>
+          <button
+            onClick={onDismiss}
+            className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center border-2 border-ink bg-card-surface"
+            aria-label="Dismiss milestone"
+          >
+            <X size={14} strokeWidth={3} className="text-ink" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Search/Filter Panel ── */
+function DaySearch({
+  days,
+  searchState,
+}: {
+  days: ChallengeDay[];
+  searchState?: Record<string, string | undefined>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+
+  const results = useMemo(() => {
+    if (!query && !statusFilter) return [];
+    return days.filter((d) => {
+      const matchesQuery =
+        !query ||
+        d.title.toLowerCase().includes(query.toLowerCase()) ||
+        d.description.toLowerCase().includes(query.toLowerCase());
+      const matchesStatus = !statusFilter || d.status === statusFilter;
+      return matchesQuery && matchesStatus;
+    });
+  }, [days, query, statusFilter]);
+
+  const showResults = open && (query || statusFilter);
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="inline-flex items-center gap-2 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
+      >
+        <Search size={12} strokeWidth={3} />
+        {open ? "Close search" : "Search days"}
+      </button>
+
+      {open && (
+        <div className="mt-3 border-2 border-ink bg-card-surface p-4">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search day titles..."
+            className="w-full rounded-none border-2 border-ink bg-base px-3 py-2 text-body text-ink outline-none focus:shadow-brutal"
+          />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <MonoLabel className="flex items-center gap-1">
+              <Filter size={9} strokeWidth={3} /> Filter
+            </MonoLabel>
+            {(["completed", "missed", "frozen", "today", "upcoming"] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatusFilter(statusFilter === s ? null : s)}
+                className={cn(
+                  "border-2 px-2 py-1 font-mono mono-label uppercase tracking-[0.16em]",
+                  statusFilter === s
+                    ? "border-ink bg-ink text-base"
+                    : "border-ink bg-card-surface text-ink",
+                )}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {showResults && (
+            <div className="mt-3 max-h-48 space-y-1 overflow-y-auto">
+              {results.length === 0 ? (
+                <p className="text-body text-muted-ink">No matching days found.</p>
+              ) : (
+                results.slice(0, 10).map((d) => (
+                  <Link
+                    key={d.dayNumber}
+                    to="/day/$n"
+                    params={{ n: String(d.dayNumber) }}
+                    search={searchState as never}
+                    className="flex items-center justify-between gap-2 border-b border-muted-ink/20 px-1 py-2 hover:bg-sidebar-surface"
+                  >
+                    <div className="flex items-center gap-2">
+                      <MonoLabel>Day {d.dayNumber}</MonoLabel>
+                      <span className="text-body-bold">{d.title}</span>
+                    </div>
+                    <Pill
+                      tone={
+                        d.status === "completed"
+                          ? "blue"
+                          : d.status === "missed"
+                            ? "red"
+                            : d.status === "frozen"
+                              ? "blue"
+                              : d.status === "today"
+                                ? "yellow"
+                                : "ink"
+                      }
+                    >
+                      {d.status}
+                    </Pill>
+                  </Link>
+                ))
+              )}
+              {results.length > 10 && (
+                <MonoLabel>{results.length - 10} more results…</MonoLabel>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Dashboard ── */
+
 function Dashboard() {
   const { student: profileId } = Route.useSearch();
   const profile = getProfile(profileId);
-  const { student, days, achievements } = profile;
+  const store = useStore();
   const search = profileId ? { student: profileId } : undefined;
+
+  // No redirect — default to web-dev if no track selected (better for demos/evaluators)
+  const trackId = store.selectedTrackId ?? profile.student.selectedTrackId ?? "web-dev";
+  const track = getTrack(trackId);
+
+  // Build days with store overrides
+  const { student, achievements } = profile;
+  const days: ChallengeDay[] = useMemo(() => {
+    return profile.days.map((d) => ({
+      ...d,
+      // Override track info from selected track
+      title: track.challengeDays[d.dayNumber - 1]?.title ?? d.title,
+      description: track.challengeDays[d.dayNumber - 1]?.description ?? d.description,
+      learningObjectives:
+        track.challengeDays[d.dayNumber - 1]?.learningObjectives ?? d.learningObjectives,
+      track: track.name,
+      // Apply store status overrides
+      status: resolvedDayStatus(trackId, d.dayNumber, d.status, store.dayStatusOverrides),
+    }));
+  }, [profile.days, track, trackId, store.dayStatusOverrides]);
+
   const today = days.find((d) => d.status === "today") ?? days[0]!;
   const unlocked = achievements.filter((a) => a.unlockedAt);
   const locked = achievements.filter((a) => !a.unlockedAt);
   const isEmpty = student.totalDaysCompleted === 0;
+  const freezesAvailable = store.streakFreezesAvailable;
+  const freezesUsed = store.streakFreezesUsed;
+
+  // Find first missed day for freeze feature
+  const firstMissedDay = days.find((d) => d.status === "missed");
+
+  // Milestone check
+  const completedCount = days.filter((d) => d.status === "completed").length;
+  const activeMilestone = [60, 30, 7].find(
+    (m) => completedCount >= m && !store.seenMilestones.includes(m),
+  );
+
+  // Check if today's task is submitted (via store overrides)
+  const todaySubmitted =
+    resolvedDayStatus(trackId, today.dayNumber, today.status, store.dayStatusOverrides) ===
+    "completed";
 
   return (
     <div className="min-h-screen grid-bg bg-base">
       <Nav student={student} cta={false} />
+
+      {/* Milestone celebration */}
+      {activeMilestone && (
+        <MilestoneBanner
+          dayNumber={activeMilestone}
+          onDismiss={() => store.dismissMilestone(activeMilestone)}
+        />
+      )}
+
+      {/* Nudge banner */}
+      <NudgeBanner
+        time={store.mockCurrentTime}
+        taskSubmitted={todaySubmitted}
+        onDismiss={store.dismissNudge}
+        dismissed={store.nudgeDismissed}
+      />
 
       {/* Demo state switcher */}
       <div className="border-b-2 border-ink bg-sidebar-surface">
@@ -101,10 +372,58 @@ function Dashboard() {
               </Link>
             );
           })}
+          <span className="mx-1 text-muted-ink">|</span>
+          <MonoLabel>Time</MonoLabel>
+          {(["day", "evening", "late-night"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => store.setMockTime(t)}
+              className={cn(
+                "border-2 border-ink px-2 py-1 font-mono mono-label uppercase tracking-[0.16em]",
+                store.mockCurrentTime === t ? "bg-ink text-base" : "bg-card-surface text-ink",
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Social proof strip */}
+      <div className="border-b-2 border-ink bg-sidebar-surface/50">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-2 md:px-10">
+          <div className="flex -space-x-1.5">
+            {["PK", "SR", "AD", "KM"].map((i) => (
+              <span
+                key={i}
+                className="flex h-6 w-6 items-center justify-center border border-ink bg-card-surface font-mono text-[7px] font-bold"
+              >
+                {i}
+              </span>
+            ))}
+          </div>
+          <p className="text-body-bold">
+            <span className="font-display text-label-bold text-blue tabular-nums">
+              {track.totalStudents}
+            </span>{" "}
+            students building on {track.name} right now
+          </p>
         </div>
       </div>
 
       <main className="mx-auto max-w-[1440px] px-4 py-8 md:px-10 md:py-12">
+        {/* Track indicator */}
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <Pill tone="blue">{track.name}</Pill>
+          <Link
+            to="/onboarding"
+            className="font-mono mono-label uppercase tracking-[0.16em] text-muted-ink underline"
+          >
+            Change track
+          </Link>
+        </div>
+
         <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
           {/* Streak */}
           <Panel className="lg:row-span-1">
@@ -113,17 +432,40 @@ function Dashboard() {
               {student.streakState === "not-started"
                 ? "Your streak starts today. Finish day 1 and this number turns blue."
                 : student.streakState === "broken"
-                  ? "You have zero submissions so far. No shame in it — day 12 is open and a fresh streak starts with one commit."
+                  ? "You have zero submissions so far. No shame in it — today is open and a fresh streak starts with one commit."
                   : student.streakState === "at-risk"
                     ? "You haven't logged today yet. Submit before midnight to keep the chain."
                     : "Chain intact. Keep it boring and keep it daily."}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <FreezeCounter available={student.streakFreezesAvailable} />
+              <FreezeCounter available={freezesAvailable} />
               <MonoLabel>
-                {student.streakFreezesUsed} used · earn more at milestones (coming soon)
+                {freezesUsed} used · earn more at milestones
               </MonoLabel>
             </div>
+
+            {/* Streak Freeze action */}
+            {firstMissedDay ? (
+              <div className="mt-4">
+                {freezesAvailable > 0 ? (
+                  <BrutalButton
+                    variant="blue"
+                    onClick={() => store.useStreakFreeze(firstMissedDay.dayNumber)}
+                    className="w-full sm:w-auto"
+                  >
+                    <Snowflake size={16} strokeWidth={3} />
+                    Use Streak Freeze to protect Day {firstMissedDay.dayNumber}
+                  </BrutalButton>
+                ) : (
+                  <div className="flex items-center gap-2 border-2 border-dashed border-muted-ink bg-sidebar-surface px-3 py-2">
+                    <Snowflake size={14} strokeWidth={3} className="text-muted-ink" />
+                    <MonoLabel>
+                      No freezes available — earn one at Day 30
+                    </MonoLabel>
+                  </div>
+                )}
+              </div>
+            ) : null}
           </Panel>
 
           {/* Today's task */}
@@ -166,6 +508,9 @@ function Dashboard() {
           <div className="mt-5">
             <DayGrid days={days} currentSearch={search} />
           </div>
+
+          {/* Search/filter */}
+          <DaySearch days={days} searchState={search} />
         </Panel>
 
         {/* Achievements */}
@@ -220,7 +565,7 @@ function Dashboard() {
             <p className="mt-3 text-body">
               Miss a night and a freeze token spends itself automatically — the day shows as{" "}
               <strong>frozen</strong>, not missed, and your streak keeps counting. You have{" "}
-              {student.streakFreezesAvailable} left.
+              {freezesAvailable} left.
             </p>
           </Panel>
           <Panel tone="sidebar">

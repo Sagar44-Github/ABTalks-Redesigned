@@ -1,0 +1,16 @@
+{
+  "name": "ABTalks — 60-Day Challenge",
+  "short_name": "ABTalks",
+  "description": "Pick a track. Build daily. Prove it with a commit and a post.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f5f0e8",
+  "theme_color": "#ffcc00",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

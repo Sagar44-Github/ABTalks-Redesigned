@@ -69,7 +69,7 @@ function Landing() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <BrutalLink to="/dashboard" className="w-full sm:w-auto">
+            <BrutalLink to="/onboarding" className="w-full sm:w-auto">
               Start your streak <ArrowRight size={18} strokeWidth={3} />
             </BrutalLink>
             <BrutalLink to="/day/$n" params={{ n: "12" }} variant="outline" className="w-full sm:w-auto">
@@ -219,9 +219,64 @@ function Landing() {
             <p className="mt-4 max-w-xl text-body">
               Day 1 takes 60 minutes. Pick your track, build the thing, drop the two links.
             </p>
-            <BrutalLink to="/dashboard" variant="ink" className="mt-8">
+            <BrutalLink to="/onboarding" variant="ink" className="mt-8">
               Start day 1 <ArrowRight size={18} strokeWidth={3} />
             </BrutalLink>
+          </div>
+        </section>
+        {/* Quick nav — explore all features */}
+        <section className="border-t-2 border-ink bg-sidebar-surface">
+          <div className="mx-auto max-w-[1440px] px-4 py-10 md:px-10 md:py-14">
+            <MonoLabel className="text-red">EXPLORE THE PRODUCT</MonoLabel>
+            <h2 className="mt-3 max-w-3xl font-display text-heading-3 uppercase md:text-heading-2">
+              Every feature, one click away
+            </h2>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <BrutalLink to="/onboarding" variant="yellow" className="w-full justify-start">
+                Pick a Track
+              </BrutalLink>
+              <BrutalLink to="/dashboard" variant="outline" className="w-full justify-start">
+                Dashboard
+              </BrutalLink>
+              <BrutalLink to="/day/$n" params={{ n: "12" }} variant="outline" className="w-full justify-start">
+                Day 12 Task
+              </BrutalLink>
+              <BrutalLink to="/day/$n" params={{ n: "1" }} variant="outline" className="w-full justify-start">
+                Day 1 Task
+              </BrutalLink>
+              <BrutalLink to="/history" variant="outline" className="w-full justify-start">
+                Submission History
+              </BrutalLink>
+              <BrutalLink to="/leaderboard" variant="outline" className="w-full justify-start">
+                Leaderboard
+              </BrutalLink>
+              <BrutalLink to="/settings" variant="outline" className="w-full justify-start">
+                Settings
+              </BrutalLink>
+              <BrutalLink to="/docs" variant="outline" className="w-full justify-start">
+                Documentation
+              </BrutalLink>
+            </div>
+            <div className="mt-6">
+              <MonoLabel>Demo profiles</MonoLabel>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <BrutalLink to="/u/$username" params={{ username: "riya-nandan" }} variant="ink" className="text-label-small">
+                  Riya — mid-challenge
+                </BrutalLink>
+                <BrutalLink to="/u/$username" params={{ username: "arjun-mehta" }} variant="ink" className="text-label-small">
+                  Arjun — day one
+                </BrutalLink>
+                <BrutalLink to="/u/$username" params={{ username: "sana-qureshi" }} variant="ink" className="text-label-small">
+                  Sana — empty profile
+                </BrutalLink>
+                <BrutalLink to="/dashboard" search={{ student: "first-day" }} variant="ink" className="text-label-small">
+                  Dashboard: first day
+                </BrutalLink>
+                <BrutalLink to="/dashboard" search={{ student: "empty" }} variant="ink" className="text-label-small">
+                  Dashboard: empty
+                </BrutalLink>
+              </div>
+            </div>
           </div>
         </section>
       </main>

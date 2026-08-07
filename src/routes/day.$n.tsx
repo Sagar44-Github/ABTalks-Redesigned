@@ -1,8 +1,22 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Check, Copy, GitCommitHorizontal, Linkedin, Snowflake } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  GitCommitHorizontal,
+  Linkedin,
+  Lock,
+  Snowflake,
+} from "lucide-react";
 import { BrutalButton, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
-import { getProfile, type ProfileId } from "@/data/abtalks";
+import { getProfile, getTrack, type ProfileId, type SubmissionRecord } from "@/data/abtalks";
+import { useStore, resolvedDayStatus } from "@/lib/store";
+import { ShareCard } from "@/components/ab/share-card";
+import { cn } from "@/lib/utils";
 
 type DaySearch = { student?: ProfileId };
 
@@ -88,9 +102,31 @@ function DayPage() {
   const { n } = Route.useParams();
   const { student: profileId } = Route.useSearch();
   const profile = getProfile(profileId);
+  const store = useStore();
   const dayNumber = Number(n);
-  const day = profile.days.find((d) => d.dayNumber === dayNumber);
-  if (!day) throw notFound();
+
+  // Resolve track
+  const trackId = store.selectedTrackId ?? profile.student.selectedTrackId ?? "web-dev";
+  const track = getTrack(trackId);
+  const trackDay = track.challengeDays[dayNumber - 1];
+  if (!trackDay) throw notFound();
+
+  const baseDay = profile.days.find((d) => d.dayNumber === dayNumber);
+  if (!baseDay) throw notFound();
+
+  // Apply overrides
+  const dayStatus = resolvedDayStatus(
+    trackId,
+    dayNumber,
+    baseDay.status,
+    store.dayStatusOverrides,
+  );
+  const day = {
+    ...baseDay,
+    ...trackDay,
+    status: dayStatus,
+    submission: dayStatus === "completed" ? baseDay.submission : null,
+  };
 
   const search = profileId ? { student: profileId } : {};
   const [github, setGithub] = useState("");
@@ -105,11 +141,21 @@ function DayPage() {
   const [caption, setCaption] = useState(draft);
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
 
   const githubValid = githubRe.test(github.trim());
   const linkedinValid = linkedinRe.test(linkedin.trim());
   const canSubmit = githubValid && linkedinValid;
-  const alreadyDone = day.submission !== null;
+  const alreadyDone = day.status === "completed" && day.submission !== null;
+  const isFuture = day.status === "upcoming";
+
+  // Milestone check
+  const isMilestone = [7, 30, 60].includes(dayNumber);
+  const milestoneMessages: Record<number, string> = {
+    7: "7 days straight. You're building a habit.",
+    30: "Halfway there. 30 days of proof.",
+    60: "60 days. Done. You finished.",
+  };
 
   const copy = async () => {
     try {
@@ -121,18 +167,72 @@ function DayPage() {
     }
   };
 
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    const record: SubmissionRecord = {
+      dayNumber: day.dayNumber,
+      trackId,
+      taskTitle: day.title,
+      submittedAt: new Date().toISOString(),
+      githubUrl: github.trim(),
+      linkedinUrl: linkedin.trim(),
+      status: "completed",
+    };
+    store.submitDay(record);
+    setSubmitted(true);
+  };
+
+  // Prev/next days
+  const hasPrev = dayNumber > 1;
+  const hasNext = dayNumber < 60;
+
   return (
     <div className="min-h-screen grid-bg bg-base">
       <Nav student={profile.student} cta={false} />
 
       <main className="mx-auto max-w-[900px] px-4 py-8 md:px-10 md:py-12">
-        <Link
-          to="/dashboard"
-          search={search}
-          className="inline-flex items-center gap-2 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
-        >
-          <ArrowLeft size={14} strokeWidth={3} /> Back to dashboard
-        </Link>
+        {/* Nav controls */}
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            to="/dashboard"
+            search={search}
+            className="inline-flex items-center gap-2 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
+          >
+            <ArrowLeft size={14} strokeWidth={3} /> Dashboard
+          </Link>
+
+          {/* Prev / Next day */}
+          <div className="flex items-center gap-1">
+            {hasPrev ? (
+              <Link
+                to="/day/$n"
+                params={{ n: String(dayNumber - 1) }}
+                search={search as never}
+                className="inline-flex items-center gap-1 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
+              >
+                <ChevronLeft size={14} strokeWidth={3} /> Day {dayNumber - 1}
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1 border-2 border-dashed border-muted-ink px-3 py-2 font-display text-label-small uppercase text-muted-ink">
+                <ChevronLeft size={14} strokeWidth={3} /> Day 0
+              </span>
+            )}
+            {hasNext ? (
+              <Link
+                to="/day/$n"
+                params={{ n: String(dayNumber + 1) }}
+                search={search as never}
+                className="inline-flex items-center gap-1 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
+              >
+                Day {dayNumber + 1} <ChevronRight size={14} strokeWidth={3} />
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1 border-2 border-dashed border-muted-ink px-3 py-2 font-display text-label-small uppercase text-muted-ink">
+                Day 61 <ChevronRight size={14} strokeWidth={3} />
+              </span>
+            )}
+          </div>
+        </div>
 
         <div className="mt-6 flex flex-wrap items-center gap-2">
           <MonoLabel>Day {day.dayNumber} of 60</MonoLabel>
@@ -144,9 +244,16 @@ function DayPage() {
               <Snowflake size={9} strokeWidth={3} /> Frozen
             </Pill>
           ) : null}
+          {isFuture ? (
+            <Pill tone="locked">
+              <Lock size={9} strokeWidth={3} /> Preview
+            </Pill>
+          ) : null}
         </div>
 
-        <h1 className="mt-4 font-display text-heading-2 uppercase md:text-heading-1">{day.title}</h1>
+        <h1 className="mt-4 font-display text-heading-2 uppercase md:text-heading-1">
+          {day.title}
+        </h1>
         <p className="mt-4 max-w-2xl text-body">{day.description}</p>
 
         <Panel className="mt-6">
@@ -161,8 +268,23 @@ function DayPage() {
           </ul>
         </Panel>
 
-        {/* Submission */}
-        {alreadyDone ? (
+        {/* Submission section */}
+        {isFuture ? (
+          /* Future/locked day */
+          <Panel className="mt-5" tone="sidebar">
+            <div className="flex items-center gap-2">
+              <Lock size={18} strokeWidth={3} className="text-muted-ink" />
+              <h2 className="font-display text-heading-3 uppercase">Not yet unlocked</h2>
+            </div>
+            <p className="mt-2 text-body">
+              This day is still ahead of you. The task content is visible so you can preview
+              what&apos;s coming, but submissions open when you reach Day {day.dayNumber}.
+            </p>
+            <p className="mt-2 font-mono mono-label uppercase tracking-[0.16em] text-muted-ink">
+              Unlocks when you complete Day {day.dayNumber - 1}
+            </p>
+          </Panel>
+        ) : alreadyDone ? (
           <Panel className="mt-5" tone="sidebar">
             <div className="flex items-center gap-2">
               <Check size={18} strokeWidth={3} className="text-blue" />
@@ -200,11 +322,38 @@ function DayPage() {
                 </p>
               </div>
             </div>
+
+            {/* Share card for completed days */}
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={() => setShowShareCard(!showShareCard)}
+                className="border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
+              >
+                {showShareCard ? "Hide" : "Generate"} Share Card
+              </button>
+              {showShareCard && (
+                <div className="mt-4">
+                  <ShareCard
+                    studentName={profile.student.name}
+                    studentInitials={profile.student.initials}
+                    dayNumber={dayNumber}
+                    taskTitle={day.title}
+                    currentStreak={profile.student.currentStreak}
+                    trackName={track.name}
+                    isMilestone={isMilestone}
+                    milestoneMessage={milestoneMessages[dayNumber]}
+                  />
+                </div>
+              )}
+            </div>
           </Panel>
         ) : submitted ? (
           <Panel className="mt-5" tone="blue">
             <h2 className="font-display text-heading-2 uppercase">Proof submitted.</h2>
-            <p className="mt-2 text-body">Streak continues. Day {day.dayNumber} is locked in.</p>
+            <p className="mt-2 text-body">
+              Streak continues. Day {day.dayNumber} is locked in.
+            </p>
             <Link
               to="/dashboard"
               search={search}
@@ -212,6 +361,31 @@ function DayPage() {
             >
               Back to dashboard
             </Link>
+
+            {/* Share card after submission */}
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={() => setShowShareCard(!showShareCard)}
+                className="border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase text-ink shadow-brutal-sm press"
+              >
+                {showShareCard ? "Hide" : "Generate"} Share Card
+              </button>
+              {showShareCard && (
+                <div className="mt-4">
+                  <ShareCard
+                    studentName={profile.student.name}
+                    studentInitials={profile.student.initials}
+                    dayNumber={dayNumber}
+                    taskTitle={day.title}
+                    currentStreak={profile.student.currentStreak}
+                    trackName={track.name}
+                    isMilestone={isMilestone}
+                    milestoneMessage={milestoneMessages[dayNumber]}
+                  />
+                </div>
+              )}
+            </div>
           </Panel>
         ) : (
           <Panel className="mt-5">
@@ -259,7 +433,11 @@ function DayPage() {
                       onClick={copy}
                       className="inline-flex items-center gap-1 border-2 border-ink bg-blue px-2 py-1 font-mono mono-label uppercase tracking-[0.16em] text-on-blue shadow-brutal-sm press"
                     >
-                      {copied ? <Check size={10} strokeWidth={3} /> : <Copy size={10} strokeWidth={3} />}
+                      {copied ? (
+                        <Check size={10} strokeWidth={3} />
+                      ) : (
+                        <Copy size={10} strokeWidth={3} />
+                      )}
                       {copied ? "Copied" : "Copy"}
                     </button>
                   </div>
@@ -278,10 +456,10 @@ function DayPage() {
 
               <BrutalButton
                 disabled={!canSubmit}
-                onClick={() => setSubmitted(true)}
+                onClick={handleSubmit}
                 className="w-full sm:w-auto"
               >
-                Submit proof
+                Submit proof <ArrowRight size={16} strokeWidth={3} />
               </BrutalButton>
               {!canSubmit ? (
                 <MonoLabel>Both links must be valid before you can submit</MonoLabel>
