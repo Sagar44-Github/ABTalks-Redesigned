@@ -26,37 +26,42 @@ export const Route = createFileRoute("/history")({
 
 function HistoryPage() {
   const { student: profileId } = Route.useSearch();
-  const profile = getProfile(profileId);
   const store = useStore();
+  const isDemoProfile = profileId === "mid" || profileId === "first-day" || profileId === "empty";
+  const profile = getProfile(profileId);
   const search = profileId ? { student: profileId } : {};
 
-  // Combine mock profile submissions with store submissions
-  const profileSubmissions = profile.days
-    .filter((d) => d.status === "completed" && d.submission)
-    .map((d) => ({
-      dayNumber: d.dayNumber,
-      trackId: profile.student.selectedTrackId ?? "web-dev",
-      taskTitle: d.title,
-      submittedAt: d.submission!.submittedAt,
-      githubUrl: d.submission!.githubUrl,
-      linkedinUrl: d.submission!.linkedinUrl,
-      status: d.status,
-    }));
+  // For a demo profile (mid, first-day, empty), include that demo profile's mock submissions.
+  // For the actual logged-in user (no demo profile query param), use ONLY store.submissions!
+  const profileSubmissions = isDemoProfile
+    ? profile.days
+        .filter((d) => d.status === "completed" && d.submission)
+        .map((d) => ({
+          dayNumber: d.dayNumber,
+          trackId: profile.student.selectedTrackId ?? "web-dev",
+          taskTitle: d.title,
+          submittedAt: d.submission!.submittedAt,
+          githubUrl: d.submission!.githubUrl,
+          linkedinUrl: d.submission!.linkedinUrl,
+          status: d.status,
+        }))
+    : [];
 
-  // Merge, deduplicate by dayNumber, sort reverse-chronological
-  const allSubmissions = [...store.submissions, ...profileSubmissions]
-    .filter(
-      (item, index, self) =>
-        index === self.findIndex((s) => s.dayNumber === item.dayNumber),
-    )
-    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  const allSubmissions = isDemoProfile
+    ? [...store.submissions, ...profileSubmissions]
+        .filter(
+          (item, index, self) =>
+            index === self.findIndex((s) => s.dayNumber === item.dayNumber),
+        )
+        .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+    : [...store.submissions].sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 
-  const frozenDays = profile.days.filter((d) => d.status === "frozen");
+  const frozenDays = isDemoProfile ? profile.days.filter((d) => d.status === "frozen") : [];
   const isEmpty = allSubmissions.length === 0 && frozenDays.length === 0;
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={profile.student} cta={false} searchState={search} />
+      <Nav student={isDemoProfile ? profile.student : undefined} cta={false} searchState={search} />
 
       <main className="mx-auto max-w-[900px] px-4 py-8 md:px-10 md:py-12">
         <MonoLabel>Submission history</MonoLabel>
