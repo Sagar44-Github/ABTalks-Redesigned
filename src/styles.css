@@ -106,9 +106,9 @@
   --text-body-bold--line-height: 19.25px;
   --text-body-bold--font-weight: 700;
 
-  --text-mono-label: 9px;
-  --text-mono-label--line-height: 13.5px;
-  --text-mono-label--font-weight: 700;
+  --mono-label: 9px;
+  --mono-label--line-height: 13.5px;
+  --mono-label--font-weight: 700;
 
   /* Spacing scale (4px base) */
   --spacing-1: 4px;
@@ -169,6 +169,12 @@
   --on-footer: #f0ede6;
   --muted-ink: #a8a49c;
   --grid-line: rgba(240, 237, 230, 0.07);
+}
+
+@utility mono-label {
+  font-size: 9px;
+  line-height: 13.5px;
+  font-weight: 700;
 }
 
 /* Hard offset shadows — never blurred */

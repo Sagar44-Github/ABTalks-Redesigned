@@ -15,7 +15,7 @@ export function MonoLabel({
   return (
     <span
       className={cn(
-        "font-mono text-mono-label uppercase tracking-[0.18em] text-muted-ink",
+        "font-mono mono-label uppercase tracking-[0.18em] text-muted-ink",
         className,
       )}
     >
@@ -136,7 +136,7 @@ export function Pill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 font-mono text-mono-label uppercase tracking-[0.16em]",
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 font-mono mono-label uppercase tracking-[0.16em]",
         tones[tone],
         className,
       )}
@@ -217,7 +217,7 @@ export function Footer() {
             Today&apos;s task
           </Link>
         </nav>
-        <p className="mt-8 font-mono text-mono-label uppercase tracking-[0.2em] opacity-60">
+        <p className="mt-8 font-mono mono-label uppercase tracking-[0.2em] opacity-60">
           Built for students in India · Mocked data · No accounts required
         </p>
       </div>
@@ -252,7 +252,7 @@ export function DayGrid({
             title={`Day ${d.dayNumber} — ${d.status}`}
             aria-label={`Day ${d.dayNumber}, ${d.status}`}
             className={cn(
-              "flex aspect-square items-center justify-center border-2 font-mono text-mono-label",
+              "flex aspect-square items-center justify-center border-2 font-mono mono-label",
               statusStyles[d.status],
               d.status === "frozen" && "text-blue",
               d.status === "upcoming" && "text-muted-ink",

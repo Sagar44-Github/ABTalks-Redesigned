@@ -74,7 +74,7 @@ function Field({
       />
       <p
         id={`${label}-hint`}
-        className={`mt-1.5 font-mono text-mono-label uppercase tracking-[0.16em] ${
+        className={`mt-1.5 font-mono mono-label uppercase tracking-[0.16em] ${
           showError ? "text-red" : "text-muted-ink"
         }`}
       >
@@ -250,14 +250,14 @@ function DayPage() {
                     <button
                       type="button"
                       onClick={() => setCaption(draft)}
-                      className="border-2 border-ink bg-card-surface px-2 py-1 font-mono text-mono-label uppercase tracking-[0.16em] shadow-brutal-sm press"
+                      className="border-2 border-ink bg-card-surface px-2 py-1 font-mono mono-label uppercase tracking-[0.16em] shadow-brutal-sm press"
                     >
                       Reset draft
                     </button>
                     <button
                       type="button"
                       onClick={copy}
-                      className="inline-flex items-center gap-1 border-2 border-ink bg-blue px-2 py-1 font-mono text-mono-label uppercase tracking-[0.16em] text-on-blue shadow-brutal-sm press"
+                      className="inline-flex items-center gap-1 border-2 border-ink bg-blue px-2 py-1 font-mono mono-label uppercase tracking-[0.16em] text-on-blue shadow-brutal-sm press"
                     >
                       {copied ? <Check size={10} strokeWidth={3} /> : <Copy size={10} strokeWidth={3} />}
                       {copied ? "Copied" : "Copy"}
@@ -271,7 +271,7 @@ function DayPage() {
                   onChange={(e) => setCaption(e.target.value)}
                   className="mt-2 w-full rounded-none border-2 border-ink bg-card-surface p-3 text-body text-ink outline-none focus:shadow-brutal"
                 />
-                <p className="mt-1.5 font-mono text-mono-label uppercase tracking-[0.16em] text-muted-ink">
+                <p className="mt-1.5 font-mono mono-label uppercase tracking-[0.16em] text-muted-ink">
                   Pre-written from today&apos;s task. Edit it, copy it, post it.
                 </p>
               </div>

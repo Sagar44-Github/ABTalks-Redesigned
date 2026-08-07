@@ -93,7 +93,7 @@ function Dashboard() {
                 key={p.id}
                 to="/dashboard"
                 search={p.id === "mid" ? {} : { student: p.id }}
-                className={`border-2 border-ink px-2 py-1 font-mono text-mono-label uppercase tracking-[0.16em] ${
+                className={`border-2 border-ink px-2 py-1 font-mono mono-label uppercase tracking-[0.16em] ${
                   active ? "bg-ink text-base" : "bg-card-surface text-ink"
                 }`}
               >
