@@ -1157,7 +1157,7 @@ export const profileList = [midProfile, firstDayProfile, emptyProfile];
 
 export function getProfile(id?: string): Profile {
   if (id === "first-day" || id === "empty" || id === "mid") return profiles[id];
-  return profiles["first-day"];
+  return profiles.mid;
 }
 
 export const platformStats = {

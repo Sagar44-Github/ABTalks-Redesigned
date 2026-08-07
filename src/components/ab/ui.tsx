@@ -247,24 +247,28 @@ export function Nav({
         <nav className="hidden items-center gap-2 lg:flex">
           <Link
             to="/dashboard"
+            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Dashboard
           </Link>
           <Link
             to="/history"
+            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             History
           </Link>
           <Link
             to="/leaderboard"
+            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Leaderboard
           </Link>
           <Link
             to="/settings"
+            search={searchState}
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             Settings
@@ -319,6 +323,7 @@ export function Nav({
           <div className="flex flex-col gap-1">
             <Link
               to="/dashboard"
+              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -326,6 +331,7 @@ export function Nav({
             </Link>
             <Link
               to="/history"
+              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -333,6 +339,7 @@ export function Nav({
             </Link>
             <Link
               to="/leaderboard"
+              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
@@ -340,6 +347,7 @@ export function Nav({
             </Link>
             <Link
               to="/settings"
+              search={searchState}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >

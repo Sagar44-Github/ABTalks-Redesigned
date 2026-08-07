@@ -56,7 +56,7 @@ function HistoryPage() {
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={profile.student} cta={false} />
+      <Nav student={profile.student} cta={false} searchState={search} />
 
       <main className="mx-auto max-w-[900px] px-4 py-8 md:px-10 md:py-12">
         <MonoLabel>Submission history</MonoLabel>

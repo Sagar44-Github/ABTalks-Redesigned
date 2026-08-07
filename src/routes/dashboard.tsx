@@ -335,7 +335,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={student} cta={false} />
+      <Nav student={student} cta={false} searchState={search} />
 
       {/* Milestone celebration */}
       {activeMilestone && (
