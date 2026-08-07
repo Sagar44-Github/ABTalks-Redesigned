@@ -353,75 +353,97 @@ function Dashboard() {
         dismissed={store.nudgeDismissed}
       />
 
-      {/* Demo state switcher */}
-      <div className="border-b-2 border-ink bg-sidebar-surface">
-        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-2 px-4 py-2 md:px-10">
-          <MonoLabel>Demo state</MonoLabel>
-          {profileList.map((p) => {
-            const active = p.id === profile.id;
-            return (
-              <Link
-                key={p.id}
-                to="/dashboard"
-                search={p.id === "mid" ? {} : { student: p.id }}
-                className={`border-2 border-ink px-2 py-1 font-mono mono-label uppercase tracking-[0.16em] ${
-                  active ? "bg-ink text-base" : "bg-card-surface text-ink"
-                }`}
-              >
-                {p.label}
-              </Link>
-            );
-          })}
-          <span className="mx-1 text-muted-ink">|</span>
-          <MonoLabel>Time</MonoLabel>
-          {(["day", "evening", "late-night"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => store.setMockTime(t)}
-              className={cn(
-                "border-2 border-ink px-2 py-1 font-mono mono-label uppercase tracking-[0.16em]",
-                store.mockCurrentTime === t ? "bg-ink text-base" : "bg-card-surface text-ink",
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Social proof strip */}
-      <div className="border-b-2 border-ink bg-sidebar-surface/50">
-        <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-2 md:px-10">
-          <div className="flex -space-x-1.5">
-            {["PK", "SR", "AD", "KM"].map((i) => (
-              <span
-                key={i}
-                className="flex h-6 w-6 items-center justify-center border border-ink bg-card-surface font-mono text-[7px] font-bold"
-              >
-                {i}
-              </span>
-            ))}
+      {/* Demo Controls Bar */}
+      <div className="border-b-2 border-ink bg-sidebar-surface py-3">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-y-3 gap-x-6 px-4 md:px-10">
+          {/* Demo Profile Control */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-muted-ink">
+              Demo Profile:
+            </span>
+            <div className="inline-flex border-2 border-ink bg-card-surface p-0.5 shadow-brutal-sm">
+              {profileList.map((p) => {
+                const active = p.id === profile.id;
+                return (
+                  <Link
+                    key={p.id}
+                    to="/dashboard"
+                    search={p.id === "mid" ? {} : { student: p.id }}
+                    className={cn(
+                      "px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-all",
+                      active
+                        ? "bg-ink text-base shadow-none"
+                        : "bg-transparent text-ink hover:bg-sidebar-surface",
+                    )}
+                  >
+                    {p.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-          <p className="text-body-bold">
-            <span className="font-display text-label-bold text-blue tabular-nums">
-              {track.totalStudents}
-            </span>{" "}
-            students building on {track.name} right now
-          </p>
+
+          {/* Time Simulation Control */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-muted-ink">
+              Simulate Time:
+            </span>
+            <div className="inline-flex border-2 border-ink bg-card-surface p-0.5 shadow-brutal-sm">
+              {(["day", "evening", "late-night"] as const).map((t) => {
+                const active = store.mockCurrentTime === t;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => store.setMockTime(t)}
+                    className={cn(
+                      "px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-all",
+                      active
+                        ? "bg-ink text-base shadow-none"
+                        : "bg-transparent text-ink hover:bg-sidebar-surface",
+                    )}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
       <main className="mx-auto max-w-[1440px] px-4 py-8 md:px-10 md:py-12">
-        {/* Track indicator */}
-        <div className="mb-5 flex flex-wrap items-center gap-2">
-          <Pill tone="blue">{track.name}</Pill>
-          <Link
-            to="/onboarding"
-            className="font-mono mono-label uppercase tracking-[0.16em] text-muted-ink underline"
-          >
-            Change track
-          </Link>
+        {/* Track Header & Social Proof */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b-2 border-ink/10 pb-5">
+          <div className="flex items-center gap-3">
+            <Pill tone="blue">{track.name}</Pill>
+            <Link
+              to="/onboarding"
+              className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-muted-ink hover:text-ink underline"
+            >
+              Change track
+            </Link>
+          </div>
+
+          {/* Social Proof */}
+          <div className="flex items-center gap-3 border-2 border-ink bg-card-surface px-3 py-1.5 shadow-brutal-sm">
+            <div className="flex -space-x-1.5">
+              {["PK", "SR", "AD", "KM"].map((i) => (
+                <span
+                  key={i}
+                  className="flex h-5 w-5 items-center justify-center border border-ink bg-blue font-mono text-[8px] font-bold text-on-blue"
+                >
+                  {i}
+                </span>
+              ))}
+            </div>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
+              <span className="font-display font-black text-blue tabular-nums">
+                {track.totalStudents}
+              </span>{" "}
+              students building right now
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
