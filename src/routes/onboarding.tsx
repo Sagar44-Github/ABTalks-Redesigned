@@ -28,7 +28,7 @@ function Onboarding() {
   const handleConfirm = () => {
     if (!selected) return;
     selectTrack(selected);
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/dashboard", search: { student: "first-day" } });
   };
 
   return (

@@ -368,7 +368,7 @@ function Dashboard() {
                   <Link
                     key={p.id}
                     to="/dashboard"
-                    search={p.id === "mid" ? {} : { student: p.id }}
+                    search={{ student: p.id }}
                     className={cn(
                       "px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-all",
                       active
