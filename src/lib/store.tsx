@@ -274,9 +274,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, lastCelebratedLevel: level }));
   }, []);
 
+  const active = state.byProfile?.[state.activeProfileId] ?? emptyProfileState;
+
   const ctx = useMemo<StoreCtx>(
     () => ({
       ...state,
+      dayStatusOverrides: active.dayStatusOverrides ?? {},
+      submissions: active.submissions ?? [],
+      extraFreezesUsed: active.extraFreezesUsed ?? 0,
+      seenMilestones: active.seenMilestones ?? [],
+      seenLevels: active.seenLevels ?? [],
       switchProfile,
       selectTrack,
       useStreakFreeze,
@@ -296,6 +303,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }),
     [
       state,
+      active,
       switchProfile,
       selectTrack,
       useStreakFreeze,
@@ -330,8 +338,9 @@ export function resolvedDayStatus(
   trackId: string,
   dayNumber: number,
   baseStatus: DayStatus,
-  overrides: Record<string, DayStatus>,
+  overrides?: Record<string, DayStatus>,
 ): DayStatus {
+  if (!overrides) return baseStatus;
   const key = `${trackId}:${dayNumber}`;
   return overrides[key] ?? baseStatus;
 }

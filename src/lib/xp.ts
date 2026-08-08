@@ -56,17 +56,18 @@ export function levelProgress(xp: number): {
 
 /* ── XP Computation ── */
 export function computeXp(
-  days: ChallengeDay[],
-  dayStatusOverrides: Record<string, DayStatus>,
-  trackId: string,
+  days: ChallengeDay[] = [],
+  dayStatusOverrides: Record<string, DayStatus> = {},
+  trackId: string = "web-dev",
 ): number {
   let xp = 0;
   let currentStreak = 0;
   const crossedStreakBonuses = new Set<number>();
+  const overrides = dayStatusOverrides ?? {};
 
-  for (const day of days) {
+  for (const day of (days ?? [])) {
     const key = `${trackId}:${day.dayNumber}`;
-    const status = dayStatusOverrides[key] ?? day.status;
+    const status = overrides[key] ?? day.status;
 
     if (status === "completed") {
       xp += BASE_DAY_XP;

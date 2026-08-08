@@ -53,7 +53,7 @@ function HistoryPage() {
       status: d.status,
     }));
 
-  const allSubmissions = [...store.submissions, ...profileSubmissions]
+  const allSubmissions = [...(store.submissions ?? []), ...profileSubmissions]
     .filter(
       (item, index, self) =>
         index === self.findIndex((s) => s.dayNumber === item.dayNumber),
