@@ -8,7 +8,7 @@
 ![Hackathon](https://img.shields.io/badge/ABTALKS-VIBE%20CODE%20HACKATHON-000000?style=for-the-badge&labelColor=000000&color=0055FF)
 ![Design](https://img.shields.io/badge/DESIGN-BRUTALIST-E63B2E?style=for-the-badge&labelColor=000000&color=E63B2E)
 
-**[🔗 Live Demo](#-live-links)** · **[📖 Docs Page](#-live-links)** · **[🐛 AI Usage Log](./PROMPTS.md)**
+**[🔗 Live Demo](https://commit-streak-forge.vercel.app/)** · **[📖 Docs Page](https://commit-streak-forge.vercel.app/docs)** · **[🐛 AI Usage Log](./PROMPTS.md)**
 
 </div>
 
@@ -28,10 +28,10 @@ This is a full mobile-first redesign, built solo for the ABTalks Vibe Code Hacka
 
 | | |
 |---|---|
-| 🌐 **Live App** | `[ADD YOUR FINAL LIVE URL HERE]` |
-| 💻 **Repository** | `[ADD YOUR GITHUB REPO URL HERE]` |
+| 🌐 **Live App** | `https://commit-streak-forge.vercel.app/` |
+| 💻 **Repository** | `https://github.com/Sagar44-Github/ABTalks-Redesigned` |
 | 📄 **AI Usage Log** | [`PROMPTS.md`](./PROMPTS.md) |
-| 📚 **In-App Docs** | `[LIVE_URL]/docs` |
+| 📚 **In-App Docs** | `https://commit-streak-forge.vercel.app/docs` |
 
 ### Required Route Map
 ```
