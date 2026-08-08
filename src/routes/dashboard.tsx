@@ -358,8 +358,8 @@ function Dashboard() {
   const unlocked = achievements.filter((a) => a.unlockedAt);
   const locked = achievements.filter((a) => !a.unlockedAt);
   const isEmpty = student.totalDaysCompleted === 0;
-  const freezesAvailable = store.streakFreezesAvailable;
-  const freezesUsed = store.streakFreezesUsed;
+  const freezesUsed = student.streakFreezesUsed + store.extraFreezesUsed;
+  const freezesAvailable = Math.max(0, student.streakFreezesAvailable - store.extraFreezesUsed);
 
   // Find first missed day for freeze feature
   const firstMissedDay = days.find((d) => d.status === "missed");

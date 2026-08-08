@@ -1,16 +1,30 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { DayStatus, MockTimeOfDay, ProfileId, SubmissionRecord } from "@/data/abtalks";
 
-/* ── Persisted state shape ── */
+/* ── Per-profile state ──
+   Everything a student "does" is scoped by profile id so switching demo
+   profiles never leaks progress, freezes or XP from one student to another. */
+
+export type ProfileState = {
+  dayStatusOverrides: Record<string, DayStatus>; // key: "trackId:dayNumber"
+  submissions: SubmissionRecord[];
+  extraFreezesUsed: number;
+  seenMilestones: number[];
+  seenLevels: number[];
+};
+
+const emptyProfileState: ProfileState = {
+  dayStatusOverrides: {},
+  submissions: [],
+  extraFreezesUsed: 0,
+  seenMilestones: [],
+  seenLevels: [],
+};
 
 export type AppState = {
   activeProfileId: ProfileId;
   selectedTrackId: string | null;
-  dayStatusOverrides: Record<string, DayStatus>; // key: "trackId:dayNumber"
-  submissions: SubmissionRecord[];
-  streakFreezesAvailable: number;
-  streakFreezesUsed: number;
-  seenMilestones: number[];
+  byProfile: Record<ProfileId, ProfileState>;
   mockCurrentTime: MockTimeOfDay;
   themePreference: "light" | "dark" | "system";
   notificationPrefs: { eveningReminder: boolean };
@@ -23,16 +37,16 @@ export type AppState = {
   lastCelebratedLevel: number;
 };
 
-const STORAGE_KEY = "abtalks-store";
+const STORAGE_KEY = "abtalks-store-v2";
 
 const defaultState: AppState = {
   activeProfileId: "mid",
   selectedTrackId: null,
-  dayStatusOverrides: {},
-  submissions: [],
-  streakFreezesAvailable: 2,
-  streakFreezesUsed: 0,
-  seenMilestones: [],
+  byProfile: {
+    mid: emptyProfileState,
+    "first-day": emptyProfileState,
+    empty: emptyProfileState,
+  },
   mockCurrentTime: "evening",
   themePreference: "system",
   notificationPrefs: { eveningReminder: true },
@@ -47,8 +61,18 @@ function loadState(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState;
-    const parsed = JSON.parse(raw);
-    return { ...defaultState, ...parsed, toastMessage: null, nudgeDismissed: false };
+    const parsed = JSON.parse(raw) as Partial<AppState>;
+    return {
+      ...defaultState,
+      ...parsed,
+      byProfile: {
+        mid: { ...emptyProfileState, ...(parsed.byProfile?.mid ?? {}) },
+        "first-day": { ...emptyProfileState, ...(parsed.byProfile?.["first-day"] ?? {}) },
+        empty: { ...emptyProfileState, ...(parsed.byProfile?.empty ?? {}) },
+      },
+      toastMessage: null,
+      nudgeDismissed: false,
+    };
   } catch {
     return defaultState;
   }
@@ -56,7 +80,6 @@ function loadState(): AppState {
 
 function saveState(state: AppState) {
   try {
-    // Don't persist transient state
     const { toastMessage: _, nudgeDismissed: __, ...persistent } = state;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persistent));
   } catch {
@@ -71,7 +94,9 @@ type StoreActions = {
   selectTrack: (trackId: string) => void;
   useStreakFreeze: (dayNumber: number) => void;
   submitDay: (record: SubmissionRecord) => void;
+  setSubmissionFeedback: (dayNumber: number, feedback: string) => void;
   dismissMilestone: (dayNumber: number) => void;
+  markLevelSeen: (level: number) => void;
   setMockTime: (time: MockTimeOfDay) => void;
   setThemePreference: (pref: "light" | "dark" | "system") => void;
   setNotificationPrefs: (prefs: { eveningReminder: boolean }) => void;
@@ -87,27 +112,43 @@ type StoreActions = {
   dismissLevelUp: (level: number) => void;
 };
 
-type StoreCtx = AppState & StoreActions;
+/* Convenience view of the ACTIVE profile's slice. */
+type ActiveView = {
+  dayStatusOverrides: Record<string, DayStatus>;
+  submissions: SubmissionRecord[];
+  extraFreezesUsed: number;
+  seenMilestones: number[];
+  seenLevels: number[];
+};
+
+type StoreCtx = AppState & StoreActions & ActiveView;
 
 const StoreContext = createContext<StoreCtx | null>(null);
+
+function updateProfile(
+  state: AppState,
+  profileId: ProfileId,
+  fn: (p: ProfileState) => ProfileState,
+): AppState {
+  const current = state.byProfile[profileId] ?? emptyProfileState;
+  return { ...state, byProfile: { ...state.byProfile, [profileId]: fn(current) } };
+}
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(defaultState);
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount (client-only)
   useEffect(() => {
     setState(loadState());
     setHydrated(true);
   }, []);
 
-  // Persist on change (skip initial hydration)
   useEffect(() => {
     if (hydrated) saveState(state);
   }, [state, hydrated]);
 
   const switchProfile = useCallback((profileId: ProfileId) => {
-    setState((s) => ({ ...s, activeProfileId: profileId }));
+    setState((s) => ({ ...s, activeProfileId: profileId, selectedTrackId: null }));
   }, []);
 
   const selectTrack = useCallback((trackId: string) => {
@@ -116,35 +157,56 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const useStreakFreeze = useCallback((dayNumber: number) => {
     setState((s) => {
-      if (s.streakFreezesAvailable <= 0) return s;
-      const key = `${s.selectedTrackId}:${dayNumber}`;
-      return {
-        ...s,
-        streakFreezesAvailable: s.streakFreezesAvailable - 1,
-        streakFreezesUsed: s.streakFreezesUsed + 1,
-        dayStatusOverrides: { ...s.dayStatusOverrides, [key]: "frozen" as DayStatus },
-        toastMessage: `Streak Freeze used — Day ${dayNumber} protected`,
-      };
+      const trackId = s.selectedTrackId ?? "web-dev";
+      const key = `${trackId}:${dayNumber}`;
+      const next = updateProfile(s, s.activeProfileId, (p) => ({
+        ...p,
+        extraFreezesUsed: p.extraFreezesUsed + 1,
+        dayStatusOverrides: { ...p.dayStatusOverrides, [key]: "frozen" as DayStatus },
+      }));
+      return { ...next, toastMessage: `Streak Freeze used — Day ${dayNumber} protected` };
     });
   }, []);
 
   const submitDay = useCallback((record: SubmissionRecord) => {
     setState((s) => {
       const key = `${record.trackId}:${record.dayNumber}`;
-      return {
-        ...s,
-        dayStatusOverrides: { ...s.dayStatusOverrides, [key]: "completed" as DayStatus },
-        submissions: [record, ...s.submissions],
-        toastMessage: `Proof submitted. Streak continues.`,
-      };
+      const next = updateProfile(s, s.activeProfileId, (p) => ({
+        ...p,
+        dayStatusOverrides: { ...p.dayStatusOverrides, [key]: "completed" as DayStatus },
+        submissions: [record, ...p.submissions.filter((x) => x.dayNumber !== record.dayNumber)],
+      }));
+      return { ...next, toastMessage: "Proof submitted. Streak continues." };
     });
   }, []);
 
+  const setSubmissionFeedback = useCallback((dayNumber: number, feedback: string) => {
+    setState((s) =>
+      updateProfile(s, s.activeProfileId, (p) => ({
+        ...p,
+        submissions: p.submissions.map((sub) =>
+          sub.dayNumber === dayNumber ? { ...sub, aiFeedback: feedback } : sub,
+        ),
+      })),
+    );
+  }, []);
+
   const dismissMilestone = useCallback((dayNumber: number) => {
-    setState((s) => ({
-      ...s,
-      seenMilestones: [...s.seenMilestones, dayNumber],
-    }));
+    setState((s) =>
+      updateProfile(s, s.activeProfileId, (p) => ({
+        ...p,
+        seenMilestones: [...p.seenMilestones, dayNumber],
+      })),
+    );
+  }, []);
+
+  const markLevelSeen = useCallback((level: number) => {
+    setState((s) =>
+      updateProfile(s, s.activeProfileId, (p) => ({
+        ...p,
+        seenLevels: p.seenLevels.includes(level) ? p.seenLevels : [...p.seenLevels, level],
+      })),
+    );
   }, []);
 
   const setMockTime = useCallback((time: MockTimeOfDay) => {
@@ -215,11 +277,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const ctx = useMemo<StoreCtx>(
     () => ({
       ...state,
+      dayStatusOverrides: active.dayStatusOverrides,
+      submissions: active.submissions,
+      extraFreezesUsed: active.extraFreezesUsed,
+      seenMilestones: active.seenMilestones,
+      seenLevels: active.seenLevels,
       switchProfile,
       selectTrack,
       useStreakFreeze,
       submitDay,
+      setSubmissionFeedback,
       dismissMilestone,
+      markLevelSeen,
       setMockTime,
       setThemePreference,
       setNotificationPrefs,
