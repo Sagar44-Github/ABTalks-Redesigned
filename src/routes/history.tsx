@@ -141,6 +141,13 @@ function HistoryPage() {
                     <ExternalLink size={8} strokeWidth={3} />
                   </a>
                 </div>
+
+                {sub.aiFeedback && (
+                  <div className="mt-3 border-2 border-ink bg-sidebar-surface p-3">
+                    <MonoLabel>AI Feedback</MonoLabel>
+                    <p className="mt-1 text-body">{sub.aiFeedback}</p>
+                  </div>
+                )}
               </div>
 
             ))}

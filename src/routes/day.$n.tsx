@@ -16,6 +16,7 @@ import { BrutalButton, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/
 import { getProfile, getTrack, type ProfileId, type SubmissionRecord } from "@/data/abtalks";
 import { useStore, resolvedDayStatus } from "@/lib/store";
 import { ShareCard } from "@/components/ab/share-card";
+import { getAiFeedback } from "@/lib/ai";
 import { cn } from "@/lib/utils";
 
 type DaySearch = { student?: ProfileId };
@@ -152,6 +153,9 @@ function DayPage() {
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState<string | null>(null);
+  const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
+  const [aiFeedbackError, setAiFeedbackError] = useState<string | null>(null);
 
   const githubValid = githubRe.test(github.trim());
   const linkedinValid = linkedinRe.test(linkedin.trim());
@@ -177,7 +181,7 @@ function DayPage() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
     const record: SubmissionRecord = {
       dayNumber: day.dayNumber,
@@ -187,9 +191,35 @@ function DayPage() {
       githubUrl: github.trim(),
       linkedinUrl: linkedin.trim(),
       status: "completed",
+      aiFeedbackStatus: "pending",
     };
     store.submitDay(record);
     setSubmitted(true);
+
+    // Fire AI feedback in background
+    setAiFeedbackLoading(true);
+    try {
+      const result = await getAiFeedback({
+        data: {
+          taskTitle: day.title,
+          taskDescription: day.description,
+          learningObjectives: day.learningObjectives,
+          githubUrl: github.trim(),
+        },
+      });
+      if (result.success && result.feedback) {
+        setAiFeedback(result.feedback);
+        store.updateSubmissionFeedback(day.dayNumber, result.feedback, "success");
+      } else {
+        setAiFeedbackError(result.error ?? "AI feedback unavailable");
+        store.updateSubmissionFeedback(day.dayNumber, null, "failed");
+      }
+    } catch {
+      setAiFeedbackError("AI feedback is temporarily unavailable. Your submission was saved successfully.");
+      store.updateSubmissionFeedback(day.dayNumber, null, "failed");
+    } finally {
+      setAiFeedbackLoading(false);
+    }
   };
 
   // Prev/next days
@@ -328,6 +358,14 @@ function DayPage() {
                   {day.submission!.linkedinCaption}
                 </p>
               </div>
+              {store.submissions.find((s) => s.dayNumber === day.dayNumber)?.aiFeedback && (
+                <div className="border-2 border-ink bg-card-surface p-3">
+                  <MonoLabel>AI Feedback</MonoLabel>
+                  <p className="mt-2 text-body">
+                    {store.submissions.find((s) => s.dayNumber === day.dayNumber)?.aiFeedback}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Share card for completed days */}
@@ -361,6 +399,29 @@ function DayPage() {
             <p className="mt-2 text-body">
               Streak continues. Day {day.dayNumber} is locked in.
             </p>
+
+            {/* AI Feedback */}
+            {aiFeedbackLoading && (
+              <div className="mt-5 border-2 border-ink bg-card-surface p-4 shadow-brutal-sm">
+                <MonoLabel>AI Feedback</MonoLabel>
+                <p className="mt-2 animate-pulse font-display text-label-bold uppercase text-muted-ink">
+                  Reading your submission…
+                </p>
+              </div>
+            )}
+            {aiFeedback && (
+              <div className="mt-5 border-2 border-ink bg-card-surface p-4 shadow-brutal-sm">
+                <MonoLabel>AI Feedback</MonoLabel>
+                <p className="mt-2 text-body">{aiFeedback}</p>
+              </div>
+            )}
+            {aiFeedbackError && !aiFeedback && !aiFeedbackLoading && (
+              <div className="mt-5 border-2 border-dashed border-muted-ink bg-sidebar-surface p-4">
+                <MonoLabel>AI Feedback</MonoLabel>
+                <p className="mt-2 text-body text-muted-ink">{aiFeedbackError}</p>
+              </div>
+            )}
+
             <Link
               to="/dashboard"
               className="mt-5 inline-flex rounded-none border-2 border-ink bg-card-surface px-5 py-3 font-display text-label-bold uppercase text-ink shadow-brutal press"

@@ -17,6 +17,10 @@ export type AppState = {
   isPublic: boolean;
   toastMessage: string | null;
   nudgeDismissed: boolean;
+  // AI features
+  aiPitches: Record<string, { pitch: string; generatedAt: string }>; // key: profileId
+  // XP/Levels
+  lastCelebratedLevel: number;
 };
 
 const STORAGE_KEY = "abtalks-store";
@@ -35,6 +39,8 @@ const defaultState: AppState = {
   isPublic: true,
   toastMessage: null,
   nudgeDismissed: false,
+  aiPitches: {},
+  lastCelebratedLevel: 0,
 };
 
 function loadState(): AppState {
@@ -74,6 +80,11 @@ type StoreActions = {
   clearToast: () => void;
   dismissNudge: () => void;
   resetStore: () => void;
+  // AI features
+  updateSubmissionFeedback: (dayNumber: number, feedback: string | null, status: "success" | "failed") => void;
+  setAiPitch: (profileId: string, pitch: string) => void;
+  // XP/Levels
+  dismissLevelUp: (level: number) => void;
 };
 
 type StoreCtx = AppState & StoreActions;
@@ -173,6 +184,34 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateSubmissionFeedback = useCallback(
+    (dayNumber: number, feedback: string | null, status: "success" | "failed") => {
+      setState((s) => ({
+        ...s,
+        submissions: s.submissions.map((sub) =>
+          sub.dayNumber === dayNumber
+            ? { ...sub, aiFeedback: feedback, aiFeedbackStatus: status }
+            : sub,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const setAiPitch = useCallback((profileId: string, pitch: string) => {
+    setState((s) => ({
+      ...s,
+      aiPitches: {
+        ...s.aiPitches,
+        [profileId]: { pitch, generatedAt: new Date().toISOString() },
+      },
+    }));
+  }, []);
+
+  const dismissLevelUp = useCallback((level: number) => {
+    setState((s) => ({ ...s, lastCelebratedLevel: level }));
+  }, []);
+
   const ctx = useMemo<StoreCtx>(
     () => ({
       ...state,
@@ -189,6 +228,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearToast,
       dismissNudge,
       resetStore,
+      updateSubmissionFeedback,
+      setAiPitch,
+      dismissLevelUp,
     }),
     [
       state,
@@ -204,6 +246,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearToast,
       dismissNudge,
       resetStore,
+      updateSubmissionFeedback,
+      setAiPitch,
+      dismissLevelUp,
     ],
   );
 

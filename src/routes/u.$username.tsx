@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Flame, GitCommitHorizontal, Linkedin } from "lucide-react";
 import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
 import { getProfile, leaderboardData, type ChallengeDay, type DayStatus } from "@/data/abtalks";
+import { useStore } from "@/lib/store";
+import { getAiPitch } from "@/lib/ai";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/u/$username")({
@@ -80,6 +83,39 @@ function PublicProfile() {
     .sort((a, b) => b.dayNumber - a.dayNumber)
     .slice(0, 5);
 
+  const store = useStore();
+  const cachedPitch = store.aiPitches[username]?.pitch;
+  const [pitch, setPitch] = useState<string | null>(cachedPitch ?? null);
+  const [loadingPitch, setLoadingPitch] = useState(false);
+  const [pitchError, setPitchError] = useState<string | null>(null);
+
+  const handleGeneratePitch = async () => {
+    setLoadingPitch(true);
+    setPitchError(null);
+    try {
+      const res = await getAiPitch({
+        data: {
+          studentName: student.name,
+          track: student.track,
+          daysCompleted: student.totalDaysCompleted,
+          currentStreak: student.currentStreak,
+          longestStreak: student.longestStreak,
+          sampleTasks: recentSubmissions.slice(0, 3).map((d) => d.title),
+        },
+      });
+      if (res.success && res.pitch) {
+        setPitch(res.pitch);
+        store.setAiPitch(username, res.pitch);
+      } else {
+        setPitchError(res.error ?? "Could not generate pitch");
+      }
+    } catch {
+      setPitchError("AI pitch generation is temporarily unavailable.");
+    } finally {
+      setLoadingPitch(false);
+    }
+  };
+
   return (
     <div className="min-h-screen grid-bg bg-base">
       <Nav studentOverride={student} />
@@ -99,6 +135,38 @@ function PublicProfile() {
               <MonoLabel>on ABTalks since {student.joinedDate}</MonoLabel>
             </div>
           </div>
+        </div>
+
+        {/* AI Recruiter Pitch */}
+        <div className="mt-6">
+          <Panel tone="yellow" className="border-2 border-ink shadow-brutal">
+            <div className="flex items-center justify-between gap-3">
+              <MonoLabel className="text-on-yellow/70">AI-Generated Recruiter Pitch</MonoLabel>
+              <button
+                type="button"
+                onClick={handleGeneratePitch}
+                disabled={loadingPitch}
+                className="border-2 border-ink bg-card-surface px-2.5 py-1 font-mono mono-label uppercase tracking-[0.16em] text-ink shadow-brutal-sm press disabled:opacity-50"
+              >
+                {loadingPitch ? "Generating…" : pitch ? "Regenerate" : "Generate pitch"}
+              </button>
+            </div>
+            {loadingPitch ? (
+              <p className="mt-3 animate-pulse font-display text-heading-3 uppercase text-on-yellow/70">
+                Crafting pitch for recruiters…
+              </p>
+            ) : pitch ? (
+              <p className="mt-3 font-display text-heading-3 uppercase leading-snug text-on-yellow">
+                &ldquo;{pitch}&rdquo;
+              </p>
+            ) : pitchError ? (
+              <p className="mt-3 text-body text-on-yellow/80">{pitchError}</p>
+            ) : (
+              <p className="mt-3 text-body text-on-yellow/80">
+                Generate an AI pitch highlighting {student.name}&apos;s proof-of-work, track consistency, and streak history for recruiters.
+              </p>
+            )}
+          </Panel>
         </div>
 
         {/* Streak prominence */}

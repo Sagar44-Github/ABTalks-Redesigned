@@ -66,6 +66,8 @@ export type SubmissionRecord = {
   githubUrl: string;
   linkedinUrl: string;
   status: DayStatus;
+  aiFeedback?: string | null;
+  aiFeedbackStatus?: "pending" | "success" | "failed" | null;
 };
 
 export type LeaderboardEntry = {
