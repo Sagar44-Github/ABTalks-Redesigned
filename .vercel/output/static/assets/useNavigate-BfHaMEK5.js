@@ -1,1 +1,0 @@
-import{Y as e,Z as t,f as n}from"./utils-cZl_diaF.js";var r=t(e(),1);function i(e){let t=n();return r.useCallback(n=>t.navigate({...n,from:n.from??e?.from}),[e?.from,t])}export{i as t};

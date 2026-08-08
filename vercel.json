@@ -1,0 +1,4 @@
+{
+  "buildCommand": "VERCEL=1 npx vite build",
+  "framework": null
+}

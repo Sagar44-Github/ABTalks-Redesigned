@@ -6,25 +6,32 @@ const GROK_TIMEOUT_MS = 15_000;
 
 async function callGrok(prompt: string): Promise<string> {
   const apiKey =
-    typeof process !== "undefined" && process?.env
-      ? (process.env.GROK_API_KEY ?? process.env.XAI_API_KEY)
-      : undefined;
+    (typeof process !== "undefined" && process?.env
+      ? (process.env.GROK_API_KEY ?? process.env.GROQ_API_KEY ?? process.env.XAI_API_KEY)
+      : undefined) ?? "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";
+
   if (!apiKey) {
     throw new Error("GROK_API_KEY is not configured");
   }
+
+  const isGroqKey = apiKey.startsWith("gsk_");
+  const endpoint = isGroqKey
+    ? "https://api.groq.com/openai/v1/chat/completions"
+    : "https://api.x.ai/v1/chat/completions";
+  const model = isGroqKey ? "llama-3.3-70b-versatile" : "grok-3-mini";
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), GROK_TIMEOUT_MS);
 
   try {
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "grok-3-mini",
+        model,
         messages: [{ role: "user", content: prompt }],
         max_tokens: 300,
         temperature: 0.7,
@@ -34,14 +41,14 @@ async function callGrok(prompt: string): Promise<string> {
 
     if (!response.ok) {
       const text = await response.text().catch(() => "");
-      throw new Error(`Grok API error ${response.status}: ${text}`);
+      throw new Error(`AI API error ${response.status}: ${text}`);
     }
 
     const data = (await response.json()) as {
       choices?: { message?: { content?: string } }[];
     };
     const content = data.choices?.[0]?.message?.content;
-    if (!content) throw new Error("Empty response from Grok");
+    if (!content) throw new Error("Empty response from AI service");
     return content.trim();
   } finally {
     clearTimeout(timeout);
