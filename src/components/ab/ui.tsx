@@ -12,7 +12,7 @@ export function MonoLabel({
   className,
 }: {
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <span
@@ -228,13 +228,15 @@ export function LogoIcon({ className }: { className?: string }) {
 
 export function Nav({
   cta = true,
+  student: studentOverride,
 }: {
   cta?: boolean;
+  student?: { name: string; initials: string; username?: string } | undefined;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const store = useStore();
   const profile = getProfile(store.activeProfileId);
-  const student = profile.student;
+  const student = studentOverride ?? profile.student;
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
@@ -280,7 +282,7 @@ export function Nav({
         <div className="flex items-center gap-2">
           <Link
             to="/u/$username"
-            params={{ username: student.name.toLowerCase().replace(/\s+/g, "-") }}
+            params={{ username: ("username" in student && student.username) || student.name.toLowerCase().replace(/\s+/g, "-") }}
             className="flex items-center gap-2 border-2 border-ink bg-card-surface px-2 py-1.5 press"
           >
             <span className="flex h-7 w-7 items-center justify-center bg-blue font-display text-label-small text-on-blue">

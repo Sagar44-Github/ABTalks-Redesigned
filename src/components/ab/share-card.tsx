@@ -10,8 +10,8 @@ type ShareCardProps = {
   taskTitle: string;
   currentStreak: number;
   trackName: string;
-  isMilestone?: boolean;
-  milestoneMessage?: string;
+  isMilestone?: boolean | undefined;
+  milestoneMessage?: string | undefined;
 };
 
 export function ShareCard({
