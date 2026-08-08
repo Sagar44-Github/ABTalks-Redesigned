@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   Flame,
@@ -174,10 +174,8 @@ function MilestoneBanner({
 /* ── Search/Filter Panel ── */
 function DaySearch({
   days,
-  searchState,
 }: {
   days: ChallengeDay[];
-  searchState?: Record<string, string | undefined>;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -248,7 +246,6 @@ function DaySearch({
                     key={d.dayNumber}
                     to="/day/$n"
                     params={{ n: String(d.dayNumber) }}
-                    search={searchState as never}
                     className="flex items-center justify-between gap-2 border-b border-muted-ink/20 px-1 py-2 hover:bg-sidebar-surface"
                   >
                     <div className="flex items-center gap-2">
@@ -290,12 +287,15 @@ function Dashboard() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
 
-  // Sync URL search param to store if explicitly provided
+  // Sync URL search param to store ONCE on mount only — never re-fire on activeProfileId changes
+  const didSyncRef = useRef(false);
   useEffect(() => {
-    if (profileId && profileId !== store.activeProfileId) {
+    if (!didSyncRef.current && profileId && profileId !== store.activeProfileId) {
       store.switchProfile(profileId);
     }
-  }, [profileId, store.activeProfileId, store.switchProfile]);
+    didSyncRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const profile = getProfile(store.activeProfileId);
 

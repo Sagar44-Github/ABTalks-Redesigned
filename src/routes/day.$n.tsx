@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -103,11 +103,15 @@ function DayPage() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
 
+  // Sync URL search param to store ONCE on mount only
+  const didSyncRef = useRef(false);
   useEffect(() => {
-    if (profileId && profileId !== store.activeProfileId) {
+    if (!didSyncRef.current && profileId && profileId !== store.activeProfileId) {
       store.switchProfile(profileId);
     }
-  }, [profileId, store.activeProfileId, store.switchProfile]);
+    didSyncRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const profile = getProfile(store.activeProfileId);
   const dayNumber = Number(n);
@@ -135,7 +139,6 @@ function DayPage() {
     submission: dayStatus === "completed" ? baseDay.submission : null,
   };
 
-  const search = profileId ? { student: profileId } : {};
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const draft = useMemo(
@@ -195,14 +198,13 @@ function DayPage() {
 
   return (
     <div className="min-h-screen grid-bg bg-base">
-      <Nav student={profile.student} cta={false} />
+      <Nav cta={false} />
 
       <main className="mx-auto max-w-[900px] px-4 py-8 md:px-10 md:py-12">
         {/* Nav controls */}
         <div className="flex items-center justify-between gap-2">
           <Link
             to="/dashboard"
-            search={search}
             className="inline-flex items-center gap-2 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
           >
             <ArrowLeft size={14} strokeWidth={3} /> Dashboard
@@ -214,7 +216,6 @@ function DayPage() {
               <Link
                 to="/day/$n"
                 params={{ n: String(dayNumber - 1) }}
-                search={search as never}
                 className="inline-flex items-center gap-1 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
               >
                 <ChevronLeft size={14} strokeWidth={3} /> Day {dayNumber - 1}
@@ -228,7 +229,6 @@ function DayPage() {
               <Link
                 to="/day/$n"
                 params={{ n: String(dayNumber + 1) }}
-                search={search as never}
                 className="inline-flex items-center gap-1 border-2 border-ink bg-card-surface px-3 py-2 font-display text-label-small uppercase shadow-brutal-sm press"
               >
                 Day {dayNumber + 1} <ChevronRight size={14} strokeWidth={3} />
@@ -363,7 +363,6 @@ function DayPage() {
             </p>
             <Link
               to="/dashboard"
-              search={search}
               className="mt-5 inline-flex rounded-none border-2 border-ink bg-card-surface px-5 py-3 font-display text-label-bold uppercase text-ink shadow-brutal press"
             >
               Back to dashboard

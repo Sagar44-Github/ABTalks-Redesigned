@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowRight, ExternalLink, GitCommitHorizontal, Linkedin } from "lucide-react";
 import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
 import { getProfile, type ProfileId } from "@/data/abtalks";
@@ -29,12 +29,15 @@ function HistoryPage() {
   const { student: profileId } = Route.useSearch();
   const store = useStore();
 
-  // Sync URL search param to store if explicitly provided
+  // Sync URL search param to store ONCE on mount only
+  const didSyncRef = useRef(false);
   useEffect(() => {
-    if (profileId && profileId !== store.activeProfileId) {
+    if (!didSyncRef.current && profileId && profileId !== store.activeProfileId) {
       store.switchProfile(profileId);
     }
-  }, [profileId, store.activeProfileId, store.switchProfile]);
+    didSyncRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const profile = getProfile(store.activeProfileId);
 

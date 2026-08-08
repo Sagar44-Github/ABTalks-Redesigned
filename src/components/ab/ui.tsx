@@ -228,13 +228,15 @@ export function LogoIcon({ className }: { className?: string }) {
 
 export function Nav({
   cta = true,
+  studentOverride,
 }: {
   cta?: boolean;
+  studentOverride?: { name: string; initials: string };
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const store = useStore();
   const profile = getProfile(store.activeProfileId);
-  const student = profile.student;
+  const student = studentOverride ?? profile.student;
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
@@ -480,10 +482,8 @@ const statusStyles: Record<DayStatus, string> = {
 
 export function DayGrid({
   days,
-  currentSearch,
 }: {
   days: ChallengeDay[];
-  currentSearch?: Record<string, string | undefined> | undefined;
 }) {
   return (
     <div>
@@ -493,7 +493,6 @@ export function DayGrid({
             key={d.dayNumber}
             to="/day/$n"
             params={{ n: String(d.dayNumber) }}
-            search={currentSearch as never}
             title={`Day ${d.dayNumber} — ${d.status}`}
             aria-label={`Day ${d.dayNumber}, ${d.status}`}
             className={cn(

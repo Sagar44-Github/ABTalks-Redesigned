@@ -18,17 +18,21 @@ import { Check, Snowflake } from "lucide-react";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div className="flex min-h-screen items-center justify-center grid-bg bg-base px-4">
+      <div className="max-w-lg text-center">
+        <span className="font-mono mono-label uppercase tracking-[0.18em] text-muted-ink">
+          Error 404
+        </span>
+        <h1 className="mt-4 font-display text-display-large uppercase text-ink">
+          Page not found
+        </h1>
+        <p className="mt-4 text-body">
+          Nothing here. The URL might be wrong, or the page was moved.
         </p>
-        <div className="mt-6">
+        <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center gap-2 rounded-none border-2 border-ink bg-yellow px-5 py-3 font-display text-label-bold uppercase text-on-yellow shadow-brutal press"
           >
             Go home
           </Link>
@@ -46,27 +50,30 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+    <div className="flex min-h-screen items-center justify-center grid-bg bg-base px-4">
+      <div className="max-w-lg text-center">
+        <span className="font-mono mono-label uppercase tracking-[0.18em] text-muted-ink">
+          Something broke
+        </span>
+        <h1 className="mt-4 font-display text-heading-1 uppercase text-ink">
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-4 text-body">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center gap-2 rounded-none border-2 border-ink bg-yellow px-5 py-3 font-display text-label-bold uppercase text-on-yellow shadow-brutal press"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center gap-2 rounded-none border-2 border-ink bg-card-surface px-5 py-3 font-display text-label-bold uppercase text-ink shadow-brutal press"
           >
             Go home
           </a>
@@ -117,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

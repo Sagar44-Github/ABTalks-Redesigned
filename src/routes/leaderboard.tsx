@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowUpDown, Flame, Trophy } from "lucide-react";
 import { Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
-import { leaderboardData, tracks, type LeaderboardEntry } from "@/data/abtalks";
+import { getProfile, leaderboardData, tracks, type LeaderboardEntry } from "@/data/abtalks";
+import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/leaderboard")({
@@ -23,6 +24,9 @@ type SortBy = "streak" | "completion";
 function LeaderboardPage() {
   const [sortBy, setSortBy] = useState<SortBy>("streak");
   const [trackFilter, setTrackFilter] = useState<string | null>(null);
+  const store = useStore();
+  const currentProfile = getProfile(store.activeProfileId);
+  const currentUsername = currentProfile.student.username;
 
   const filtered = trackFilter
     ? leaderboardData.filter((e) => e.trackId === trackFilter)
@@ -36,9 +40,6 @@ function LeaderboardPage() {
 
   // Re-rank after filter/sort
   const ranked = sorted.map((entry, i) => ({ ...entry, rank: i + 1 }));
-
-  // Current student (from mock — Riya Nandan)
-  const currentUsername = "riya-nandan";
 
   return (
     <div className="min-h-screen grid-bg bg-base">
