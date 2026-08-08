@@ -5,6 +5,7 @@ import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab
 import { getProfile, leaderboardData, type ChallengeDay, type DayStatus } from "@/data/abtalks";
 import { useStore } from "@/lib/store";
 import { getAiPitch } from "@/lib/ai";
+import { computeXp, levelProgress } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/u/$username")({
@@ -116,6 +117,9 @@ function PublicProfile() {
     }
   };
 
+  const xp = computeXp(days, profile ? store.dayStatusOverrides : {}, student.selectedTrackId ?? "web-dev");
+  const { level } = levelProgress(xp);
+
   return (
     <div className="min-h-screen grid-bg bg-base">
       <Nav studentOverride={student} />
@@ -131,6 +135,7 @@ function PublicProfile() {
               {student.name}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Pill tone="yellow">Level {level}</Pill>
               <Pill tone="blue">{student.track}</Pill>
               <MonoLabel>on ABTalks since {student.joinedDate}</MonoLabel>
             </div>

@@ -25,6 +25,7 @@ import {
 import { getProfile, getTrack, profileList, type ChallengeDay, type ProfileId } from "@/data/abtalks";
 import { useStore, resolvedDayStatus } from "@/lib/store";
 import { NudgeBanner } from "@/components/ab/nudge-banner";
+import { computeXp, levelProgress, levelUpCopy } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 
 type DashSearch = { student?: ProfileId };
@@ -162,6 +163,40 @@ function MilestoneBanner({
             onClick={onDismiss}
             className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center border-2 border-ink bg-card-surface"
             aria-label="Dismiss milestone"
+          >
+            <X size={14} strokeWidth={3} className="text-ink" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Level-Up Banner ── */
+function LevelUpBanner({
+  level,
+  onDismiss,
+}: {
+  level: number;
+  onDismiss: () => void;
+}) {
+  const { title, sub } = levelUpCopy(level);
+  return (
+    <div className="border-b-2 border-ink bg-yellow text-on-yellow py-5 md:py-8">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-10">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sparkles size={18} strokeWidth={3} />
+              <MonoLabel className="text-on-yellow/70">LEVEL UP · LEVEL {level}</MonoLabel>
+            </div>
+            <h2 className="mt-3 font-display text-heading-2 md:text-heading-1 uppercase">{title}</h2>
+            <p className="mt-3 max-w-xl text-body">{sub}</p>
+          </div>
+          <button
+            onClick={onDismiss}
+            className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center border-2 border-ink bg-card-surface"
+            aria-label="Dismiss level up"
           >
             <X size={14} strokeWidth={3} className="text-ink" />
           </button>
@@ -335,6 +370,11 @@ function Dashboard() {
     (m) => completedCount >= m && !store.seenMilestones.includes(m),
   );
 
+  // XP & Level check
+  const xp = computeXp(days, store.dayStatusOverrides, trackId);
+  const { level, currentXp, nextLevelXp, progress } = levelProgress(xp);
+  const showLevelUp = level > 1 && level > store.lastCelebratedLevel && !activeMilestone;
+
   // Check if today's task is submitted (via store overrides)
   const todaySubmitted =
     resolvedDayStatus(trackId, today.dayNumber, today.status, store.dayStatusOverrides) ===
@@ -349,6 +389,14 @@ function Dashboard() {
         <MilestoneBanner
           dayNumber={activeMilestone}
           onDismiss={() => store.dismissMilestone(activeMilestone)}
+        />
+      )}
+
+      {/* Level-Up celebration */}
+      {showLevelUp && (
+        <LevelUpBanner
+          level={level}
+          onDismiss={() => store.dismissLevelUp(level)}
         />
       )}
 
@@ -471,6 +519,23 @@ function Dashboard() {
               <MonoLabel>
                 {freezesUsed} used · earn more at milestones
               </MonoLabel>
+            </div>
+
+            {/* XP & Level Progress */}
+            <div className="mt-5 border-t-2 border-ink/20 pt-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Pill tone="yellow">Level {level}</Pill>
+                  <MonoLabel>{currentXp} XP</MonoLabel>
+                </div>
+                <MonoLabel>{Math.max(0, nextLevelXp - currentXp)} XP to Level {level + 1}</MonoLabel>
+              </div>
+              <div className="mt-2.5 h-3 w-full border-2 border-ink bg-sidebar-surface p-0.5 shadow-brutal-sm">
+                <div
+                  className="h-full bg-blue transition-all duration-300"
+                  style={{ width: `${Math.round(progress * 100)}%` }}
+                />
+              </div>
             </div>
 
             {/* Streak Freeze action */}

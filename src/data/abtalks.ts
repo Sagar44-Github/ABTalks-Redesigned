@@ -1027,6 +1027,20 @@ const midProfile: Profile = {
       badgeStyle: "blue",
     },
     {
+      id: "level-5",
+      title: "Reached Level 5",
+      description: "Earn enough XP to cross Level 5.",
+      unlockedAt: "2026-06-10",
+      badgeStyle: "yellow",
+    },
+    {
+      id: "level-10",
+      title: "Reached Level 10",
+      description: "Earn enough XP to reach Level 10 status.",
+      unlockedAt: null,
+      badgeStyle: "ink",
+    },
+    {
       id: "halfway",
       title: "Halfway There",
       description: "Reach day 30 to unlock.",

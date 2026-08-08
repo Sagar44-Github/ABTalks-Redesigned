@@ -4,6 +4,7 @@ import { ArrowUpDown, Flame, Trophy } from "lucide-react";
 import { Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
 import { getProfile, leaderboardData, tracks, type LeaderboardEntry } from "@/data/abtalks";
 import { useStore } from "@/lib/store";
+import { levelFromXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/leaderboard")({
@@ -121,6 +122,8 @@ function LeaderboardPage() {
           {ranked.map((entry) => {
             const isCurrentUser = entry.username === currentUsername;
             const isTop3 = entry.rank <= 3;
+            const entryXp = Math.floor(entry.currentStreak * 14 + entry.completionPercentage * 3.5);
+            const entryLevel = levelFromXp(entryXp);
             return (
               <Link
                 key={entry.username}
@@ -156,7 +159,8 @@ function LeaderboardPage() {
                     </p>
                     {isCurrentUser && <Pill tone="yellow">You</Pill>}
                   </div>
-                  <div className="mt-1 flex items-center gap-2">
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <Pill tone="yellow">Lvl {entryLevel}</Pill>
                     <Pill tone="ink">{tracks.find((t) => t.id === entry.trackId)?.name ?? entry.trackId}</Pill>
                   </div>
                 </div>

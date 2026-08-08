@@ -194,6 +194,7 @@ function DayPage() {
       aiFeedbackStatus: "pending",
     };
     store.submitDay(record);
+    store.showToast("Proof submitted. +15 XP earned — streak continues!");
     setSubmitted(true);
 
     // Fire AI feedback in background
