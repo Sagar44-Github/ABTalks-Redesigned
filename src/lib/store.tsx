@@ -277,18 +277,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const ctx = useMemo<StoreCtx>(
     () => ({
       ...state,
-      dayStatusOverrides: active.dayStatusOverrides,
-      submissions: active.submissions,
-      extraFreezesUsed: active.extraFreezesUsed,
-      seenMilestones: active.seenMilestones,
-      seenLevels: active.seenLevels,
       switchProfile,
       selectTrack,
       useStreakFreeze,
       submitDay,
-      setSubmissionFeedback,
       dismissMilestone,
-      markLevelSeen,
       setMockTime,
       setThemePreference,
       setNotificationPrefs,
@@ -303,6 +296,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }),
     [
       state,
+      switchProfile,
       selectTrack,
       useStreakFreeze,
       submitDay,
