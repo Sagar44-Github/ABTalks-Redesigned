@@ -5,7 +5,10 @@ import { createServerFn } from "@tanstack/react-start";
 const GROK_TIMEOUT_MS = 15_000;
 
 async function callGrok(prompt: string): Promise<string> {
-  const apiKey = process.env.GROK_API_KEY ?? process.env.XAI_API_KEY;
+  const apiKey =
+    typeof process !== "undefined" && process?.env
+      ? (process.env.GROK_API_KEY ?? process.env.XAI_API_KEY)
+      : undefined;
   if (!apiKey) {
     throw new Error("GROK_API_KEY is not configured");
   }
