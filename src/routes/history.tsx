@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { ArrowRight, ExternalLink, GitCommitHorizontal, Linkedin } from "lucide-react";
 import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
-import { getProfile, type ProfileId } from "@/data/abtalks";
+import { getProfile, type ProfileId, type SubmissionRecord } from "@/data/abtalks";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
