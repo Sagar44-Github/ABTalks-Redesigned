@@ -117,7 +117,9 @@ function PublicProfile() {
     }
   };
 
-  const xp = computeXp(days, profile ? store.dayStatusOverrides : {}, student.selectedTrackId ?? "web-dev");
+  const viewedTrackId =
+    "selectedTrackId" in student ? (student.selectedTrackId ?? "web-dev") : "web-dev";
+  const xp = computeXp(days, profile ? store.dayStatusOverrides : {}, viewedTrackId);
   const { level } = levelProgress(xp);
 
   return (
