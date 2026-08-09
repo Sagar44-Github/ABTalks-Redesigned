@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Flame, GitCommitHorizontal, Linkedin } from "lucide-react";
 import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
-import { getProfile, leaderboardData, type ChallengeDay, type DayStatus } from "@/data/abtalks";
+import { getProfile, leaderboardData, type ChallengeDay, type DayStatus, type ProfileId } from "@/data/abtalks";
 import { useStore } from "@/lib/store";
 import { getAiPitch } from "@/lib/ai";
 import { computeXp, levelProgress } from "@/lib/xp";
@@ -33,6 +33,11 @@ function PublicProfile() {
   const { username } = Route.useParams();
 
   // Find the matching profile or leaderboard entry
+  const usernameToProfileId: Record<string, ProfileId> = {
+    "riya-nandan": "mid",
+    "arjun-mehta": "first-day",
+    "sana-qureshi": "empty",
+  };
   const knownProfiles: Record<string, ReturnType<typeof getProfile>> = {
     "riya-nandan": getProfile("mid"),
     "arjun-mehta": getProfile("first-day"),
@@ -117,8 +122,20 @@ function PublicProfile() {
     }
   };
 
-  const xp = computeXp(days, profile ? store.dayStatusOverrides : {}, student.selectedTrackId ?? "web-dev");
-  const { level } = levelProgress(xp);
+  /* XP is derived from the VIEWED student's own data. Session overrides only
+     apply when the viewed profile is also the active demo profile, so one
+     student's progress never leaks onto another's public page. */
+  const viewedProfileId = usernameToProfileId[username];
+  const overrides =
+    viewedProfileId && viewedProfileId === store.activeProfileId ? store.dayStatusOverrides : {};
+  const viewedTrackId =
+    "selectedTrackId" in student ? (student.selectedTrackId ?? "web-dev") : "web-dev";
+  const xp = profile
+    ? computeXp(days, overrides, viewedTrackId)
+    : Math.floor(
+        leaderboardEntry!.currentStreak * 14 + leaderboardEntry!.completionPercentage * 3.5,
+      );
+  const { level, nextLevelXp, progress } = levelProgress(xp);
 
   return (
     <div className="min-h-screen grid-bg bg-base">
@@ -141,6 +158,30 @@ function PublicProfile() {
             </div>
           </div>
         </div>
+
+        {/* Level + XP */}
+        <Panel className="mt-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <MonoLabel>Level</MonoLabel>
+              <p className="mt-1 font-display text-heading-1 uppercase tabular-nums text-blue">
+                {level}
+              </p>
+            </div>
+            <div className="text-right">
+              <MonoLabel>{xp} XP earned</MonoLabel>
+              <p className="mt-1 font-mono mono-label uppercase tracking-[0.16em]">
+                {Math.max(0, nextLevelXp - xp)} XP to Level {level + 1}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 h-3 w-full border-2 border-ink bg-sidebar-surface p-0.5">
+            <div
+              className="h-full bg-yellow transition-all duration-300"
+              style={{ width: `${Math.round(progress * 100)}%` }}
+            />
+          </div>
+        </Panel>
 
         {/* AI Recruiter Pitch */}
         <div className="mt-6">
