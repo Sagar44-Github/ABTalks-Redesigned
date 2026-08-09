@@ -278,6 +278,12 @@ export function Nav({
             Portfolio
           </Link>
           <Link
+            to="/certificate"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+          >
+            Certificate
+          </Link>
+          <Link
             to="/leaderboard"
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
@@ -478,6 +484,8 @@ export function Footer() {
             <p className="font-mono mono-label uppercase tracking-[0.2em] opacity-60">Features</p>
             <nav className="mt-3 flex flex-col gap-2 font-display text-label-small uppercase">
               <Link to="/history" className="hover:text-yellow">History</Link>
+              <Link to="/portfolio" className="hover:text-yellow">Portfolio</Link>
+              <Link to="/certificate" className="hover:text-yellow">Certificate</Link>
               <Link to="/leaderboard" className="hover:text-yellow">Leaderboard</Link>
               <Link to="/settings" className="hover:text-yellow">Settings</Link>
               <Link to="/docs" className="hover:text-yellow">Documentation</Link>

@@ -471,13 +471,32 @@ function Dashboard() {
       <main className="mx-auto max-w-[1440px] px-4 py-8 md:px-10 md:py-12">
         {/* Track Header & Social Proof */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b-2 border-ink/10 pb-5">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Pill tone="blue">{track.name}</Pill>
             <Link
               to="/onboarding"
               className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-muted-ink hover:text-ink underline"
             >
               Change track
+            </Link>
+            <span className="text-muted-ink">·</span>
+            <Link
+              to="/certificate"
+              className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-ink hover:text-blue underline"
+            >
+              Certificate
+            </Link>
+            <Link
+              to="/portfolio"
+              className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-ink hover:text-blue underline"
+            >
+              Portfolio
+            </Link>
+            <Link
+              to="/squad"
+              className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-ink hover:text-blue underline"
+            >
+              Squad
             </Link>
           </div>
 
