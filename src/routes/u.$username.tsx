@@ -117,9 +117,19 @@ function PublicProfile() {
     }
   };
 
+  /* XP is derived from the VIEWED student's own data. Session overrides only
+     apply when the viewed profile is also the active demo profile, so one
+     student's progress never leaks onto another's public page. */
+  const viewedProfileId = usernameToProfileId[username];
+  const overrides =
+    viewedProfileId && viewedProfileId === store.activeProfileId ? store.dayStatusOverrides : {};
   const viewedTrackId =
     "selectedTrackId" in student ? (student.selectedTrackId ?? "web-dev") : "web-dev";
-  const xp = computeXp(days, profile ? store.dayStatusOverrides : {}, viewedTrackId);
+  const xp = profile
+    ? computeXp(days, overrides, viewedTrackId)
+    : Math.floor(
+        leaderboardEntry!.currentStreak * 14 + leaderboardEntry!.completionPercentage * 3.5,
+      );
   const { level, nextLevelXp, progress } = levelProgress(xp);
 
   return (
