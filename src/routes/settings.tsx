@@ -1,8 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle, Bell, Eye, Moon, Sun, Monitor, RefreshCw } from "lucide-react";
 import { BrutalButton, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
-import { tracks } from "@/data/abtalks";
+import { tracks, getProfile } from "@/data/abtalks";
+import {
+  freezeExpiryCopy,
+  notificationSupport,
+  reminderCopy,
+  requestNotificationPermission,
+  scheduleReminder,
+  sendNotification,
+  type NotifPermission,
+} from "@/lib/notifications";
 import { useStore } from "@/lib/store";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -61,6 +70,25 @@ function SettingsPage() {
   const navigate = useNavigate();
   const [showTrackWarning, setShowTrackWarning] = useState(false);
   const [pendingTrack, setPendingTrack] = useState<string | null>(null);
+  const [permission, setPermission] = useState<NotifPermission>("default");
+  const profile = getProfile(store.activeProfileId);
+
+  useEffect(() => {
+    setPermission(notificationSupport());
+  }, []);
+
+  const enablePush = async () => {
+    const result = await requestNotificationPermission();
+    setPermission(result);
+    if (result === "granted") {
+      sendNotification("Push notifications on", "We'll nudge you before midnight if today is still unlogged.");
+      store.showToast("Push notifications enabled");
+    } else if (result === "denied") {
+      store.showToast("Your browser blocked notifications");
+    } else if (result === "unsupported") {
+      store.showToast("This browser doesn't support notifications");
+    }
+  };
 
   const currentTrack = tracks.find((t) => t.id === store.selectedTrackId) ?? tracks[0]!;
 
@@ -203,16 +231,55 @@ function SettingsPage() {
             <Bell size={16} strokeWidth={3} className="text-blue" />
             <h2 className="font-display text-heading-3 uppercase">Notifications</h2>
           </div>
-          <MonoLabel className="mt-1 block">Mocked — no real notifications are sent</MonoLabel>
+          <MonoLabel className="mt-1 block">
+            Browser push · status: {permission}
+          </MonoLabel>
 
           <div className="mt-3 divide-y divide-muted-ink/20">
             <Toggle
               checked={store.notificationPrefs.eveningReminder}
               onChange={(v) => store.setNotificationPrefs({ eveningReminder: v })}
               label="Evening reminder"
-              description="Get a nudge in the evening if you haven't submitted today"
+              description="A nudge as the day runs out if today is still unlogged"
             />
           </div>
+
+          {permission !== "granted" ? (
+            <BrutalButton className="mt-4" onClick={enablePush}>
+              <Bell size={16} strokeWidth={3} /> Enable push notifications
+            </BrutalButton>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <BrutalButton
+                variant="outline"
+                onClick={() => {
+                  const day = profile.student.totalDaysCompleted + 1;
+                  const copy = reminderCopy(1, day, profile.student.currentStreak);
+                  sendNotification(copy.title, copy.body);
+                }}
+              >
+                Send midnight reminder
+              </BrutalButton>
+              <BrutalButton
+                variant="outline"
+                onClick={() => {
+                  const copy = freezeExpiryCopy(profile.student.streakFreezesAvailable);
+                  sendNotification(copy.title, copy.body);
+                }}
+              >
+                Send freeze alert
+              </BrutalButton>
+              <BrutalButton
+                variant="outline"
+                onClick={() => {
+                  scheduleReminder(10_000, "Still unlogged", "Ten seconds was the demo. Midnight is the real deadline.");
+                  store.showToast("Reminder scheduled in 10 seconds");
+                }}
+              >
+                Test scheduled nudge
+              </BrutalButton>
+            </div>
+          )}
         </Panel>
 
         {/* Public profile */}

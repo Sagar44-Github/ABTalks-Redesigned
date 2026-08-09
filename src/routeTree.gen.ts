@@ -10,18 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CertificateRouteImport } from './routes/certificate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PrepRouteImport } from './routes/prep'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SquadRouteImport } from './routes/squad'
 import { Route as DayNRouteImport } from './routes/day.$n'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificateRoute = CertificateRouteImport.update({
+  id: '/certificate',
+  path: '/certificate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -49,9 +58,24 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrepRoute = PrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SquadRoute = SquadRouteImport.update({
+  id: '/squad',
+  path: '/squad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DayNRoute = DayNRouteImport.update({
@@ -67,35 +91,47 @@ const UUsernameRoute = UUsernameRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/certificate': typeof CertificateRoute
   '/dashboard': typeof DashboardRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
+  '/portfolio': typeof PortfolioRoute
+  '/prep': typeof PrepRoute
   '/settings': typeof SettingsRoute
+  '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
   '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/certificate': typeof CertificateRoute
   '/dashboard': typeof DashboardRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
+  '/portfolio': typeof PortfolioRoute
+  '/prep': typeof PrepRoute
   '/settings': typeof SettingsRoute
+  '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
   '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/certificate': typeof CertificateRoute
   '/dashboard': typeof DashboardRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
+  '/portfolio': typeof PortfolioRoute
+  '/prep': typeof PrepRoute
   '/settings': typeof SettingsRoute
+  '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -103,46 +139,62 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/certificate'
     | '/dashboard'
     | '/docs'
     | '/history'
     | '/leaderboard'
     | '/onboarding'
+    | '/portfolio'
+    | '/prep'
     | '/settings'
+    | '/squad'
     | '/day/$n'
     | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/certificate'
     | '/dashboard'
     | '/docs'
     | '/history'
     | '/leaderboard'
     | '/onboarding'
+    | '/portfolio'
+    | '/prep'
     | '/settings'
+    | '/squad'
     | '/day/$n'
     | '/u/$username'
   id:
     | '__root__'
     | '/'
+    | '/certificate'
     | '/dashboard'
     | '/docs'
     | '/history'
     | '/leaderboard'
     | '/onboarding'
+    | '/portfolio'
+    | '/prep'
     | '/settings'
+    | '/squad'
     | '/day/$n'
     | '/u/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CertificateRoute: typeof CertificateRoute
   DashboardRoute: typeof DashboardRoute
   DocsRoute: typeof DocsRoute
   HistoryRoute: typeof HistoryRoute
   LeaderboardRoute: typeof LeaderboardRoute
   OnboardingRoute: typeof OnboardingRoute
+  PortfolioRoute: typeof PortfolioRoute
+  PrepRoute: typeof PrepRoute
   SettingsRoute: typeof SettingsRoute
+  SquadRoute: typeof SquadRoute
   DayNRoute: typeof DayNRoute
   UUsernameRoute: typeof UUsernameRoute
 }
@@ -154,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificate': {
+      id: '/certificate'
+      path: '/certificate'
+      fullPath: '/certificate'
+      preLoaderRoute: typeof CertificateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -191,11 +250,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prep': {
+      id: '/prep'
+      path: '/prep'
+      fullPath: '/prep'
+      preLoaderRoute: typeof PrepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squad': {
+      id: '/squad'
+      path: '/squad'
+      fullPath: '/squad'
+      preLoaderRoute: typeof SquadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/day/$n': {
@@ -217,12 +297,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CertificateRoute: CertificateRoute,
   DashboardRoute: DashboardRoute,
   DocsRoute: DocsRoute,
   HistoryRoute: HistoryRoute,
   LeaderboardRoute: LeaderboardRoute,
   OnboardingRoute: OnboardingRoute,
+  PortfolioRoute: PortfolioRoute,
+  PrepRoute: PrepRoute,
   SettingsRoute: SettingsRoute,
+  SquadRoute: SquadRoute,
   DayNRoute: DayNRoute,
   UUsernameRoute: UUsernameRoute,
 }
