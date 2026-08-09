@@ -144,6 +144,30 @@ function PublicProfile() {
           </div>
         </div>
 
+        {/* Level + XP */}
+        <Panel className="mt-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <MonoLabel>Level</MonoLabel>
+              <p className="mt-1 font-display text-heading-1 uppercase tabular-nums text-blue">
+                {level}
+              </p>
+            </div>
+            <div className="text-right">
+              <MonoLabel>{xp} XP earned</MonoLabel>
+              <p className="mt-1 font-mono mono-label uppercase tracking-[0.16em]">
+                {Math.max(0, nextLevelXp - xp)} XP to Level {level + 1}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 h-3 w-full border-2 border-ink bg-sidebar-surface p-0.5">
+            <div
+              className="h-full bg-yellow transition-all duration-300"
+              style={{ width: `${Math.round(progress * 100)}%` }}
+            />
+          </div>
+        </Panel>
+
         {/* AI Recruiter Pitch */}
         <div className="mt-6">
           <Panel tone="yellow" className="border-2 border-ink shadow-brutal">
