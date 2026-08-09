@@ -16,6 +16,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SquadRouteImport } from './routes/squad'
 import { Route as DayNRouteImport } from './routes/day.$n'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 
@@ -54,6 +55,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SquadRoute = SquadRouteImport.update({
+  id: '/squad',
+  path: '/squad',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DayNRoute = DayNRouteImport.update({
   id: '/day/$n',
   path: '/day/$n',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
+  '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
+  '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
+  '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/onboarding'
     | '/settings'
+    | '/squad'
     | '/day/$n'
     | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/onboarding'
     | '/settings'
+    | '/squad'
     | '/day/$n'
     | '/u/$username'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/onboarding'
     | '/settings'
+    | '/squad'
     | '/day/$n'
     | '/u/$username'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   OnboardingRoute: typeof OnboardingRoute
   SettingsRoute: typeof SettingsRoute
+  SquadRoute: typeof SquadRoute
   DayNRoute: typeof DayNRoute
   UUsernameRoute: typeof UUsernameRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/squad': {
+      id: '/squad'
+      path: '/squad'
+      fullPath: '/squad'
+      preLoaderRoute: typeof SquadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/day/$n': {
       id: '/day/$n'
       path: '/day/$n'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   OnboardingRoute: OnboardingRoute,
   SettingsRoute: SettingsRoute,
+  SquadRoute: SquadRoute,
   DayNRoute: DayNRoute,
   UUsernameRoute: UUsernameRoute,
 }
