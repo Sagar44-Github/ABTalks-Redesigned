@@ -8,7 +8,7 @@
 ![Stack](https://img.shields.io/badge/STACK-TANSTACK%20START-121110?style=for-the-badge&labelColor=121110&color=4D8AFF)
 ![Solo](https://img.shields.io/badge/BUILD-SOLO-121110?style=for-the-badge&labelColor=121110&color=FFD84D)
 
-**[🔗 Live Demo](https://commit-streak-forge.vercel.app/)** · **[📖 In-App Docs](https://commit-streak-forge.vercel.app/docs)** · **[🐛 AI Usage Log](./PROMPTS.md)** · **[📜 Full Build Transcript](./transcript.md)**
+**[🔗 Live Demo](https://ab-talks-redesigned.vercel.app/)** · **[📖 In-App Docs](https://commit-streak-forge.vercel.app/docs)** · **[✨ Full Feature Reference](./FEATURES.md)** · **[🐛 AI Usage Log](./PROMPTS.md)** · **[📜 Full Build Transcript](./transcript.md)**
 
 </div>
 
