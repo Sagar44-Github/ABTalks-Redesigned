@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Flame, GitCommitHorizontal, Linkedin } from "lucide-react";
 import { BrutalLink, Footer, MonoLabel, Nav, Panel, Pill } from "@/components/ab/ui";
-import { getProfile, leaderboardData, type ChallengeDay, type DayStatus } from "@/data/abtalks";
+import { getProfile, leaderboardData, type ChallengeDay, type DayStatus, type ProfileId } from "@/data/abtalks";
 import { useStore } from "@/lib/store";
 import { getAiPitch } from "@/lib/ai";
 import { computeXp, levelProgress } from "@/lib/xp";
