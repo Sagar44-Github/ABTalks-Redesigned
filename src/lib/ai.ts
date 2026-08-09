@@ -8,7 +8,7 @@ async function callGrok(prompt: string): Promise<string> {
   const apiKey =
     (typeof process !== "undefined" && process?.env
       ? (process.env['GROK_API_KEY'] ?? process.env['GROQ_API_KEY'] ?? process.env['XAI_API_KEY'])
-      : undefined) ?? "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";
+      : undefined);
 
   if (!apiKey) {
     throw new Error("GROK_API_KEY is not configured");

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CertificateRouteImport } from './routes/certificate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as HistoryRouteImport } from './routes/history'
@@ -25,6 +26,11 @@ import { Route as UUsernameRouteImport } from './routes/u.$username'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificateRoute = CertificateRouteImport.update({
+  id: '/certificate',
+  path: '/certificate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -85,6 +91,7 @@ const UUsernameRoute = UUsernameRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/certificate': typeof CertificateRoute
   '/dashboard': typeof DashboardRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/certificate': typeof CertificateRoute
   '/dashboard': typeof DashboardRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/certificate': typeof CertificateRoute
   '/dashboard': typeof DashboardRoute
   '/docs': typeof DocsRoute
   '/history': typeof HistoryRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/certificate'
     | '/dashboard'
     | '/docs'
     | '/history'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/certificate'
     | '/dashboard'
     | '/docs'
     | '/history'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/certificate'
     | '/dashboard'
     | '/docs'
     | '/history'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CertificateRoute: typeof CertificateRoute
   DashboardRoute: typeof DashboardRoute
   DocsRoute: typeof DocsRoute
   HistoryRoute: typeof HistoryRoute
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificate': {
+      id: '/certificate'
+      path: '/certificate'
+      fullPath: '/certificate'
+      preLoaderRoute: typeof CertificateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -277,6 +297,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CertificateRoute: CertificateRoute,
   DashboardRoute: DashboardRoute,
   DocsRoute: DocsRoute,
   HistoryRoute: HistoryRoute,
