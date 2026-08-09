@@ -17,6 +17,9 @@ import { getProfile, getTrack, type ProfileId, type SubmissionRecord } from "@/d
 import { useStore, resolvedDayStatus } from "@/lib/store";
 import { ShareCard } from "@/components/ab/share-card";
 import { getAiFeedback } from "@/lib/ai";
+import { GithubVerify } from "@/components/ab/github-verify";
+import { InterviewCard } from "@/components/ab/interview-card";
+import { interviewCardFor } from "@/data/community";
 import { cn } from "@/lib/utils";
 
 type DaySearch = { student?: ProfileId };
@@ -181,6 +184,13 @@ function DayPage() {
     }
   };
 
+  const postToLinkedIn = () => {
+    const shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(caption)}`;
+    void navigator.clipboard?.writeText(caption).catch(() => {});
+    window.open(shareUrl, "_blank", "noopener,noreferrer");
+    store.showToast("LinkedIn opened with your caption pre-filled");
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
     const record: SubmissionRecord = {
@@ -306,6 +316,11 @@ function DayPage() {
           </ul>
         </Panel>
 
+        {/* Daily interview card */}
+        <div className="mt-5">
+          <InterviewCard card={interviewCardFor(day)} />
+        </div>
+
         {/* Submission section */}
         {isFuture ? (
           /* Future/locked day */
@@ -423,6 +438,10 @@ function DayPage() {
               </div>
             )}
 
+            <div className="mt-5">
+              <GithubVerify url={github.trim()} auto />
+            </div>
+
             <Link
               to="/dashboard"
               className="mt-5 inline-flex rounded-none border-2 border-ink bg-card-surface px-5 py-3 font-display text-label-bold uppercase text-ink shadow-brutal press"
@@ -480,6 +499,8 @@ function DayPage() {
                 hint="Public post URL on linkedin.com"
               />
 
+              {githubValid ? <GithubVerify url={github.trim()} /> : null}
+
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <label
@@ -507,6 +528,13 @@ function DayPage() {
                         <Copy size={10} strokeWidth={3} />
                       )}
                       {copied ? "Copied" : "Copy"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={postToLinkedIn}
+                      className="inline-flex items-center gap-1 border-2 border-ink bg-ink px-2 py-1 font-mono mono-label uppercase tracking-[0.16em] text-base shadow-brutal-sm press"
+                    >
+                      <Linkedin size={10} strokeWidth={3} /> Post now
                     </button>
                   </div>
                 </div>
