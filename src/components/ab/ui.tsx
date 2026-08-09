@@ -246,7 +246,7 @@ export function Nav({
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden items-center gap-2 lg:flex">
+        <nav className="hidden items-center gap-2 xl:flex">
           <Link
             to="/dashboard"
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
@@ -258,6 +258,24 @@ export function Nav({
             className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
           >
             History
+          </Link>
+          <Link
+            to="/squad"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+          >
+            Squad
+          </Link>
+          <Link
+            to="/prep"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+          >
+            Prep
+          </Link>
+          <Link
+            to="/portfolio"
+            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+          >
+            Portfolio
           </Link>
           <Link
             to="/leaderboard"
@@ -305,7 +323,7 @@ export function Nav({
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-none border-2 border-ink bg-card-surface text-ink shadow-brutal-sm press lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-none border-2 border-ink bg-card-surface text-ink shadow-brutal-sm press xl:hidden"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X size={18} strokeWidth={3} /> : <Menu size={18} strokeWidth={3} />}
@@ -314,7 +332,7 @@ export function Nav({
       </div>
       {/* Mobile menu */}
       {mobileOpen && (
-        <nav className="border-t-2 border-ink bg-sidebar-surface px-4 py-3 lg:hidden">
+        <nav className="border-t-2 border-ink bg-sidebar-surface px-4 py-3 xl:hidden">
           <div className="flex flex-col gap-1">
             <Link
               to="/dashboard"
@@ -329,6 +347,34 @@ export function Nav({
               className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
             >
               <History size={14} strokeWidth={3} /> History
+            </Link>
+            <Link
+              to="/squad"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <Users size={14} strokeWidth={3} /> Squad
+            </Link>
+            <Link
+              to="/prep"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <Brain size={14} strokeWidth={3} /> Prep deck
+            </Link>
+            <Link
+              to="/portfolio"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <Layers size={14} strokeWidth={3} /> Portfolio
+            </Link>
+            <Link
+              to="/certificate"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-2 py-2 font-display text-label-bold uppercase"
+            >
+              <Award size={14} strokeWidth={3} /> Certificate
             </Link>
             <Link
               to="/leaderboard"
