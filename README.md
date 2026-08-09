@@ -2,13 +2,14 @@
 
 # ⬛ ABTALKS — BRUTALIST COMMAND CENTER
 
-### A ground-up redesign of the ABTalks 60-day coding challenge platform
+### A ground-up mobile-first redesign & gamified proof-of-work platform for the ABTalks 60-Day Challenge
 
 ![Status](https://img.shields.io/badge/STATUS-LIVE-FFCC00?style=for-the-badge&labelColor=000000&color=FFCC00)
 ![Hackathon](https://img.shields.io/badge/ABTALKS-VIBE%20CODE%20HACKATHON-000000?style=for-the-badge&labelColor=000000&color=0055FF)
-![Design](https://img.shields.io/badge/DESIGN-BRUTALIST-E63B2E?style=for-the-badge&labelColor=000000&color=E63B2E)
+![Design](https://img.shields.io/badge/DESIGN-BRUTALIST%20COMMAND%20CENTER-E63B2E?style=for-the-badge&labelColor=000000&color=E63B2E)
+![Stack](https://img.shields.io/badge/STACK-TANSTACK%20START%20%7C%20VITE-0055FF?style=for-the-badge&labelColor=000000&color=0055FF)
 
-**[🔗 Live Demo](https://commit-streak-forge.vercel.app/)** · **[📖 Docs Page](https://commit-streak-forge.vercel.app/docs)** · **[🐛 AI Usage Log](./PROMPTS.md)**
+**[🔗 Live Demo](https://commit-streak-forge.vercel.app/)** · **[📖 In-App Docs](https://commit-streak-forge.vercel.app/docs)** · **[🐛 AI Usage Log](./PROMPTS.md)**
 
 </div>
 
@@ -16,35 +17,68 @@
 
 ## ▌ Overview
 
-ABTalks runs a **60-day coding challenge** for Indian college students. Students pick a track, build something every day, and maintain a public streak by submitting a **GitHub commit** + a **LinkedIn post**. Most usage happens on a phone, late at night, after college.
+ABTalks runs a **60-day coding challenge** for Indian college students. Students pick a track, build something daily, and maintain a public streak by submitting a **GitHub commit** link and a **LinkedIn post** link. Most usage happens on mobile devices, late at night, after college.
 
-The product worked. **It had never been designed.**
-
-This is a full mobile-first redesign, built solo for the ABTalks Vibe Code Hackathon, cloning and extending a brutalist design language ("Brutalist Command Center") into a complete, personalized, AI-integrated, gamified product — while staying strictly within the brief's scope (mocked data, no real auth/database).
+This product is a complete mobile-first redesign built for the **ABTalks Vibe Code Hackathon**. It establishes a high-contrast **"Brutalist Command Center"** design language, introducing multi-profile state management, AI-powered proof feedback, AI recruiter pitch synthesis, and a complete XP/Levels gamification system — while staying strictly within the hackathon's scope.
 
 ---
 
-## ▌ Live Links
+## ▌ Live Links & Repository Map
 
-| | |
+| Resource | Link / Path |
 |---|---|
-| 🌐 **Live App** | `https://commit-streak-forge.vercel.app/` |
-| 💻 **Repository** | `https://github.com/Sagar44-Github/ABTalks-Redesigned` |
+| 🌐 **Live Web Application** | [commit-streak-forge.vercel.app](https://commit-streak-forge.vercel.app/) |
+| 💻 **GitHub Repository** | [Sagar44-Github/ABTalks-Redesigned](https://github.com/Sagar44-Github/ABTalks-Redesigned) |
 | 📄 **AI Usage Log** | [`PROMPTS.md`](./PROMPTS.md) |
-| 📚 **In-App Docs** | `https://commit-streak-forge.vercel.app/docs` |
+| 📚 **In-App Documentation** | [/docs](https://commit-streak-forge.vercel.app/docs) |
 
-### Required Route Map
+### Complete Route Map
 ```
-/
-/dashboard
-/day/12
+/                      → Landing Page (Trust, track overview, social proof)
+/dashboard             → Command Center (Streak, XP bar, Level, today's task, 60-day grid)
+/onboarding            → Track Selector (Personalizes 60-day curriculum)
+/history               → Submissions History (Timeline, links, cached AI feedback)
+/leaderboard           → Student Leaderboards (Streaks, completion %, Level badges, filter/sort)
+/settings              → Preferences (Track, theme mode, evening notifications, profile visibility)
+/docs                  → In-App Architecture & Design System Documentation
+/day/$n                → Daily Task Page (Curriculum, auto-drafted caption, proof submission)
+/u/$username           → Public Recruiter Profile (Streaks, AI Recruiter Pitch, badges, recent proof)
 ```
+
+---
+
+## ▌ Key Architectural Innovations
+
+### 1. State Synchronization & Scoping
+- **Single Source of Truth Store**: All active profile data is managed via a unified React Context store (`src/lib/store.tsx`). Profile switching updates Nav, Dashboard, History, Settings, and Public Profiles synchronously without route state desync.
+- **One-Shot URL Sync**: Prevents URL search parameters (`?student=`) from overwriting user-initiated profile switches via a ref-guarded mount effect.
+- **Defensive State Loading**: `loadState()` safely validates persisted `localStorage` payloads against schema changes, preventing nullish dereference crashes.
+
+### 2. Dual AI Provider Support (Groq + xAI Grok)
+- **Server Functions (`src/lib/ai.ts`)**: Server-side AI calls built using `@tanstack/react-start`'s `createServerFn` to ensure API keys are never exposed to the client.
+- **Auto-Provider Detection**:
+  - Keys starting with `gsk_` route to **Groq** (`api.groq.com/openai/v1/chat/completions` using `llama-3.3-70b-versatile`).
+  - Keys starting with `xai-` route to **xAI Grok** (`api.x.ai/v1/chat/completions` using `grok-3-mini`).
+- **Graceful Fallback**: Transparent error banners and fallback text if API keys are unconfigured, rate-limited, or timing out.
+
+### 3. XP Economy & Level Curve (`src/lib/xp.ts`)
+- **Deterministic Math**: Level is derived dynamically from cumulative XP — never stored independently:
+  - Base Day Completion: **+10 XP**
+  - Task Difficulty Bonus: Starter (+0), Core (+3), Stretch (+5)
+  - Streak Threshold Bonuses: Day 7 (+20 XP), Day 30 (+50 XP), Day 60 (+100 XP)
+  - Streak Freeze Protection: **+5 XP**
+- **UI Integration**:
+  - **Dashboard**: Live Level badge, XP counter, and smooth progress bar toward the next level threshold.
+  - **Public Profile**: `Level X` header pill next to track metadata.
+  - **Leaderboard**: `Lvl X` row pill for every student.
+  - **Level-Up Celebrations**: Custom dismissible celebration banner when crossing level thresholds.
+  - **XP Toast**: Instant feedback toast (`+15 XP earned`) on proof submission.
 
 ---
 
 ## ▌ Design System — "Brutalist Command Center"
 
-Cloned from an extracted reference design system, then **extended with an original dark mode** (the reference site has none). High-contrast, mechanical, zero-curve, hard-edged — the opposite of a soft default SaaS look.
+Cloned from a reference design system and extended with an **original dark mode** (not present in the reference). Industrial, high-contrast, zero-curve, hard-edged aesthetic designed to maximize visual urgency.
 
 <table>
 <tr><td width="50%">
@@ -59,11 +93,11 @@ Cloned from an extracted reference design system, then **extended with an origin
 | Ink | `#1A1A1A` |
 | Background | `#F5F0E8` |
 | Card Surface | `#FFFFFF` |
-| Footer Dark | `#171717` |
+| Sidebar Surface | `#EFECE6` |
 
 </td><td width="50%">
 
-**Dark Mode** *(original — not in source)*
+**Dark Mode** *(Custom Extension)*
 | Token | Hex |
 |---|---|
 | 🟨 Accent Yellow | `#FFD84D` |
@@ -73,147 +107,101 @@ Cloned from an extracted reference design system, then **extended with an origin
 | Ink | `#F0EDE6` |
 | Background | `#121110` |
 | Card Surface | `#201E1B` |
-| Footer | `#000000` |
+| Sidebar Surface | `#181715` |
 
 </td></tr>
 </table>
 
-**Signature traits**
-- Ultra-heavy **Space Grotesk** (weight 900) headlines, tight negative letter-spacing
-- **Zero border-radius** on every interactive element — buttons, inputs, nav
-- **Hard offset shadows** (`4px 4px 0px`) — no blur, ever
-- **JetBrains Mono** for micro-labels and status badges
-- **Inter** for body copy
-- Tricolor accent system used *semantically*, never decoratively — yellow = primary action, red = alerts, blue = stats
+### Signature Design Rules
+- **Zero Border-Radius**: All buttons, panels, inputs, and badges maintain sharp `0px` corners.
+- **Hard Offset Shadows**: Hard pixel drop-shadows (`4px 4px 0px #000000`) without blur effects.
+- **Typography Hierarchy**:
+  - **Space Grotesk** (Weight 900) for heavy headlines.
+  - **JetBrains Mono** for technical labels, status indicators, and numbers.
+  - **Inter** for crisp body text.
+- **Semantic Accents**: Yellow for primary actions/milestones, Red for alerts/missed states, Blue for streak counts and achievements.
 
-Every color pair meets **WCAG AA (4.5:1)** contrast in both modes.
+---
+
+## ▌ Full Feature Matrix
+
+### 🟨 Core & Edge Cases
+- **3 Demo Profiles**: Switch live between **Riya Nandan** (Mid-challenge, 11-day streak with frozen day), **Arjun Mehta** (First day, day 1 open), and **Sana Qureshi** (Empty profile, broken streak).
+- **Streak Freeze Token**: Limited protection token that turns missed days into `frozen` without breaking current streak.
+- **Auto-Drafted LinkedIn Caption**: Generates pre-written, editable post text from daily task objectives.
+
+### 🟦 Visibility & Recruiter Features
+- **AI Recruiter Pitch**: Synthesizes student progress, track, completed days, and sample proof into a 2-3 sentence recruiter pitch on `/u/$username`.
+- **AI Submission Feedback**: Analyzes GitHub submissions against task learning objectives to provide immediate encouragement on `/day/$n`.
+- **Dynamic Share Card**: In-browser shareable proof card for milestones and completions.
+
+### 🟥 Platform Infrastructure
+- **PWA Ready**: Manifest, service worker support, and mobile viewport optimization (390px default).
+- **Time-Aware Nudges**: Morning/Evening/Late-Night context banners encouraging students to log proof before midnight.
+- **Custom 404 & Error Boundaries**: Fully styled error components matching the brutalist design system.
 
 ---
 
 ## ▌ Tech Stack
 
-| Layer | Choice |
+| Layer | Technologies |
 |---|---|
-| Framework | Next.js / TanStack Router + Vite |
-| Styling | Tailwind CSS, custom token-driven theme |
-| Fonts | Space Grotesk · Inter · JetBrains Mono |
-| Data | Mocked JSON — no database |
-| Auth | None (explicitly out of scope) |
-| AI | xAI **Grok API** (server-side only) |
-| Hosting | Vercel |
-| State | Single-source-of-truth store, demo-profile-scoped |
-
-No environment variables are required to run the core app. **One** is required for the AI features:
-```
-GROK_API_KEY=your_key_here
-```
-Read server-side only — never exposed to the client. The app degrades gracefully with a clear fallback message if this key is missing.
+| **Framework** | TanStack Start / TanStack Router + React 19 |
+| **Build System** | Vite + Nitro (Vercel Preset output `.vercel/output`) |
+| **Styling** | Vanilla CSS + Tailwind CSS v4, custom CSS variables |
+| **Icons & Fonts** | Lucide React · Space Grotesk · Inter · JetBrains Mono |
+| **AI Integration** | Groq API (`llama-3.3-70b-versatile`) / xAI Grok API (`grok-3-mini`) |
+| **Deployment** | Vercel |
 
 ---
 
-## ▌ Required Routes
+## ▌ Local Development Setup
 
-| Route | Purpose |
-|---|---|
-| `/` | Landing page — trust, clarity, and motivation for a first-time visitor |
-| `/dashboard` | Streak, today's task, 60-day progress grid, completion %, achievements |
-| `/day/12` | Full challenge-day experience — task, learning objectives, proof submission |
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/Sagar44-Github/ABTalks-Redesigned.git
+   cd ABTalks-Redesigned
+   ```
 
-### The Three Required Edge Cases
-- **First day, no streak** — genuine start state, not a broken "0"
-- **Missed day** — five distinct day-grid states (completed / missed / frozen / today / upcoming), never punishing in tone
-- **Empty profile** — every section gets a real designed empty state, never a blank "undefined"
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
----
+3. **Configure Environment Variables (Optional)**:
+   Create a `.env` file in the project root to enable live AI features:
+   ```env
+   GROQ_API_KEY=gsk_your_groq_key_here
+   # OR
+   GROK_API_KEY=xai-your_xai_key_here
+   ```
 
-## ▌ Full Feature Set
+4. **Start Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173` in your browser.
 
-### 🟨 Core (MVP)
-- Three required routes, mobile-first at 390px, full light + dark mode
-- All three required edge cases, each demoable via a dedicated mock profile
-- **Streak Freeze** — a limited token that protects a missed day, visually distinct on the day-grid
-- **Auto-drafted LinkedIn caption** — pre-filled, editable, removes late-night posting friction
-
-### 🟦 Phase 2 — Personalization & Navigation
-- `/onboarding` — real track selection that drives **personalized 60-day content**, not decorative
-- Day-to-day navigation (prev/next + jump from the progress grid)
-- Interactive Streak Freeze — actually clickable, updates state live
-- `/history` — full submission history with a real empty state
-- Live toast micro-interactions on submit
-- Milestone celebrations at Day 7 / 30 / 60
-- Social proof strip
-
-### 🟥 Phase 3 — Visibility & Sharing
-- `/u/[username]` — **public, recruiter-facing profile page**
-- Downloadable/shareable "Day Card" images
-- Dashboard search/filter across all 60 days
-- Time-aware nudge banner (day / evening / late-night tone)
-- `/leaderboard`
-- `/settings` — track switching, theme, notification prefs, profile visibility
-- Basic PWA setup (manifest + service worker)
-
-### ⚡ Phase 4 — Real AI Integration
-- **AI-Powered Submission Feedback** — after submitting proof, a live **Grok API** call generates short, task-aware feedback. Cached per submission. Labeled transparently as AI-generated. Graceful fallback if the API is unavailable.
-- **AI-Generated Recruiter Pitch** — on the public profile, Grok synthesizes a student's entire track record (days completed, streak, sample work) into a genuine recruiter-facing pitch — the most direct payoff of ABTalks' own stated purpose.
-
-### 🎮 XP & Levels
-- Every meaningful action earns XP (submissions, streak-length bonuses, milestones, freezes used, achievements unlocked)
-- Level always **derived** from cumulative XP via a fixed 10-level curve — never stored independently, so it can never drift out of sync
-- Visible on the dashboard, public profile, and leaderboard
-- Distinct level-up celebration, reusing the milestone-celebration pattern, with specific non-generic copy
-
-### 📚 `/docs`
-An in-app documentation page covering the ABTalks product itself, this redesign's scope, a live design-system reference, the full feature list, and the specific design decisions behind the required edge cases.
+5. **Build for Production (Vercel)**:
+   ```bash
+   npm run build
+   ```
 
 ---
 
-## ▌ Mock Data & Demo Profiles
+## ▌ Out of Scope (By Challenge Design)
 
-No real backend. A structured mock dataset drives the entire app, with **multiple distinct demo profiles** so every edge case and feature can be demonstrated on real, realistic state — first-day, mid-challenge (with a missed + frozen day), and empty-profile — switchable live from the nav/footer, with state correctly scoped per profile across every route.
-
----
-
-## ▌ Architecture Notes
-
-- **Single source of truth**: one shared store governs the active demo profile across Nav, Dashboard, History, Settings, and every route that depends on "who's logged in" — no route independently re-initializes or overrides this state.
-- **Server-side AI calls only**: the Grok API key is never exposed client-side; both AI features route through server functions.
-- **Graceful degradation**: every AI feature has an explicit, tested fallback state for a missing key, timeout, or rate limit — the app never crashes or shows a raw error.
-
----
-
-## ▌ What's Explicitly Out of Scope
-
-Per the challenge brief:
-- Authentication / real user accounts
-- Production database
-- Recruiter dashboard / admin panel
-- Matching ABTalks' existing tech stack
-
----
-
-## ▌ Running Locally
-
-```bash
-git clone [YOUR_REPO_URL]
-cd [PROJECT_FOLDER]
-npm install
-# Optional — enables AI features:
-echo "GROK_API_KEY=your_key_here" > .env
-npm run dev
-```
-
----
-
-## ▌ AI Usage
-
-This project was built using AI-assisted "vibe coding" across two tools: **Claude** for planning, design-system extraction, and feature specification, and **Lovable + Antigravity** for implementation. The complete, honest prompt history is in [`PROMPTS.md`](./PROMPTS.md) at the repo root.
+As specified in the hackathon prompt:
+- Real backend authentication / database persistence
+- Employer recruiter login dashboard
+- Live GitHub API webhooks
 
 ---
 
 <div align="center">
 
-**Built solo for the ABTalks Vibe Code Hackathon** · Aug 2026
+**Built for the ABTalks Vibe Code Hackathon** · Aug 2026
 
-![Made with Brutalist Design](https://img.shields.io/badge/DESIGN-ZERO%20RADIUS-000000?style=flat-square&labelColor=FFCC00&color=000000)
+![Zero Curves](https://img.shields.io/badge/DESIGN-ZERO%20CURVES-000000?style=flat-square&labelColor=FFCC00&color=000000)
 
 </div>
