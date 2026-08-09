@@ -373,7 +373,8 @@ function Dashboard() {
   // XP & Level check
   const xp = computeXp(days, store.dayStatusOverrides, trackId);
   const { level, currentXp, nextLevelXp, progress } = levelProgress(xp);
-  const showLevelUp = level > 1 && level > store.lastCelebratedLevel && !activeMilestone;
+  // Level-up celebration is per-profile (seenLevels) and never stacks with a milestone banner
+  const showLevelUp = level > 1 && !store.seenLevels.includes(level) && !activeMilestone;
 
   // Check if today's task is submitted (via store overrides)
   const todaySubmitted =
