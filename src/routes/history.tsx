@@ -41,7 +41,7 @@ function HistoryPage() {
 
   const profile = getProfile(store.activeProfileId);
 
-  const profileSubmissions = profile.days
+  const profileSubmissions: SubmissionRecord[] = profile.days
     .filter((d) => d.status === "completed" && d.submission)
     .map((d) => ({
       dayNumber: d.dayNumber,
