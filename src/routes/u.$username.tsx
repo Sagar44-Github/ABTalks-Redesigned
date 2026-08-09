@@ -33,6 +33,11 @@ function PublicProfile() {
   const { username } = Route.useParams();
 
   // Find the matching profile or leaderboard entry
+  const usernameToProfileId: Record<string, ProfileId> = {
+    "riya-nandan": "mid",
+    "arjun-mehta": "first-day",
+    "sana-qureshi": "empty",
+  };
   const knownProfiles: Record<string, ReturnType<typeof getProfile>> = {
     "riya-nandan": getProfile("mid"),
     "arjun-mehta": getProfile("first-day"),
