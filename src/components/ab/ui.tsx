@@ -240,64 +240,64 @@ export function Nav({
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-ink bg-sidebar-surface">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3.5 md:px-10">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-2.5 md:px-10">
         <Link to="/" className="flex items-center gap-2 press">
-          <LogoFull className="h-12 md:h-16 w-auto" />
+          <LogoFull className="h-8 md:h-10 w-auto" />
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden items-center gap-2 xl:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           <Link
             to="/dashboard"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Dashboard
           </Link>
           <Link
             to="/history"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             History
           </Link>
           <Link
             to="/squad"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Squad
           </Link>
           <Link
             to="/prep"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Prep
           </Link>
           <Link
             to="/portfolio"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Portfolio
           </Link>
           <Link
             to="/certificate"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Certificate
           </Link>
           <Link
             to="/leaderboard"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Leaderboard
           </Link>
           <Link
             to="/settings"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Settings
           </Link>
           <Link
             to="/docs"
-            className="px-3 py-1.5 font-display text-label-bold uppercase tracking-wide hover:text-blue"
+            className="px-2 py-1 font-display text-label-small uppercase tracking-wider hover:text-blue"
           >
             Docs
           </Link>
@@ -329,16 +329,16 @@ export function Nav({
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-none border-2 border-ink bg-card-surface text-ink shadow-brutal-sm press xl:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-none border-2 border-ink bg-card-surface text-ink shadow-brutal-sm press lg:hidden"
             aria-label="Toggle menu"
           >
-            {mobileOpen ? <X size={18} strokeWidth={3} /> : <Menu size={18} strokeWidth={3} />}
+            {mobileOpen ? <X size={16} strokeWidth={3} /> : <Menu size={16} strokeWidth={3} />}
           </button>
         </div>
       </div>
       {/* Mobile menu */}
       {mobileOpen && (
-        <nav className="border-t-2 border-ink bg-sidebar-surface px-4 py-3 xl:hidden">
+        <nav className="border-t-2 border-ink bg-sidebar-surface px-4 py-3 lg:hidden">
           <div className="flex flex-col gap-1">
             <Link
               to="/dashboard"
