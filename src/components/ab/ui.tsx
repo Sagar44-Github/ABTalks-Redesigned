@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Moon, Sun, Snowflake, History, Trophy, FileText, Settings, Menu, X } from "lucide-react";
+import { Moon, Sun, Snowflake, History, Trophy, FileText, Settings, Menu, X, Users, Brain, Layers, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/theme";
 import { useStore } from "@/lib/store";
