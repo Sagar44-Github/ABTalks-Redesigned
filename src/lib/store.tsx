@@ -297,6 +297,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       selectTrack,
       useStreakFreeze,
       submitDay,
+      setSubmissionFeedback,
+      markLevelSeen,
       dismissMilestone,
       setMockTime,
       setThemePreference,
