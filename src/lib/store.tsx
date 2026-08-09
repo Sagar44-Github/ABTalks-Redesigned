@@ -248,14 +248,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const updateSubmissionFeedback = useCallback(
     (dayNumber: number, feedback: string | null, status: "success" | "failed") => {
-      setState((s) => ({
-        ...s,
-        submissions: s.submissions.map((sub) =>
-          sub.dayNumber === dayNumber
-            ? { ...sub, aiFeedback: feedback, aiFeedbackStatus: status }
-            : sub,
-        ),
-      }));
+      setState((s) =>
+        updateProfile(s, s.activeProfileId, (p) => ({
+          ...p,
+          submissions: p.submissions.map((sub) =>
+            sub.dayNumber === dayNumber
+              ? { ...sub, aiFeedback: feedback, aiFeedbackStatus: status }
+              : sub,
+          ),
+        })),
+      );
     },
     [],
   );
@@ -270,8 +272,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* Level-up celebrations are per-profile: mark every level up to `level` seen
+     so switching demo profiles never leaks another student's celebration. */
   const dismissLevelUp = useCallback((level: number) => {
-    setState((s) => ({ ...s, lastCelebratedLevel: level }));
+    setState((s) =>
+      updateProfile(s, s.activeProfileId, (p) => ({
+        ...p,
+        seenLevels: p.seenLevels.includes(level) ? p.seenLevels : [...p.seenLevels, level],
+      })),
+    );
   }, []);
 
   const active = state.byProfile?.[state.activeProfileId] ?? emptyProfileState;
