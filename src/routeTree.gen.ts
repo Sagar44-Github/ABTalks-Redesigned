@@ -16,6 +16,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PrepRouteImport } from './routes/prep'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SquadRouteImport } from './routes/squad'
 import { Route as DayNRouteImport } from './routes/day.$n'
@@ -56,6 +57,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrepRoute = PrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
   '/portfolio': typeof PortfolioRoute
+  '/prep': typeof PrepRoute
   '/settings': typeof SettingsRoute
   '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
   '/portfolio': typeof PortfolioRoute
+  '/prep': typeof PrepRoute
   '/settings': typeof SettingsRoute
   '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/onboarding': typeof OnboardingRoute
   '/portfolio': typeof PortfolioRoute
+  '/prep': typeof PrepRoute
   '/settings': typeof SettingsRoute
   '/squad': typeof SquadRoute
   '/day/$n': typeof DayNRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/onboarding'
     | '/portfolio'
+    | '/prep'
     | '/settings'
     | '/squad'
     | '/day/$n'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/onboarding'
     | '/portfolio'
+    | '/prep'
     | '/settings'
     | '/squad'
     | '/day/$n'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/onboarding'
     | '/portfolio'
+    | '/prep'
     | '/settings'
     | '/squad'
     | '/day/$n'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   OnboardingRoute: typeof OnboardingRoute
   PortfolioRoute: typeof PortfolioRoute
+  PrepRoute: typeof PrepRoute
   SettingsRoute: typeof SettingsRoute
   SquadRoute: typeof SquadRoute
   DayNRoute: typeof DayNRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prep': {
+      id: '/prep'
+      path: '/prep'
+      fullPath: '/prep'
+      preLoaderRoute: typeof PrepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   OnboardingRoute: OnboardingRoute,
   PortfolioRoute: PortfolioRoute,
+  PrepRoute: PrepRoute,
   SettingsRoute: SettingsRoute,
   SquadRoute: SquadRoute,
   DayNRoute: DayNRoute,
