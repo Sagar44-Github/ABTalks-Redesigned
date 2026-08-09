@@ -39,9 +39,13 @@ This product is a complete mobile-first redesign built for the **ABTalks Vibe Co
 /onboarding            → Track Selector (Personalizes 60-day curriculum)
 /history               → Submissions History (Timeline, links, cached AI feedback)
 /leaderboard           → Student Leaderboards (Streaks, completion %, Level badges, filter/sort)
+/portfolio             → Proof-of-Work Portfolio (Recruiter showcase, GitHub verification, projects)
+/certificate           → Completion Certificate (Verifiable credential card with QR code)
+/prep                  → Interview Prep Center (AI mock questions, task-specific prep cards)
+/squad                 → Peer Building Squads (Daily check-ins, squad leaderboard, accountability)
 /settings              → Preferences (Track, theme mode, evening notifications, profile visibility)
 /docs                  → In-App Architecture & Design System Documentation
-/day/$n                → Daily Task Page (Curriculum, auto-drafted caption, proof submission)
+/day/$n                → Daily Task Page (Curriculum, auto-drafted caption, proof submission, GitHub verify)
 /u/$username           → Public Recruiter Profile (Streaks, AI Recruiter Pitch, badges, recent proof)
 ```
 
@@ -133,9 +137,15 @@ Cloned from a reference design system and extended with an **original dark mode*
 ### 🟦 Visibility & Recruiter Features
 - **AI Recruiter Pitch**: Synthesizes student progress, track, completed days, and sample proof into a 2-3 sentence recruiter pitch on `/u/$username`.
 - **AI Submission Feedback**: Analyzes GitHub submissions against task learning objectives to provide immediate encouragement on `/day/$n`.
+- **Proof-of-Work Portfolio (`/portfolio`)**: Dedicated recruiter showcase page with verified GitHub commit badges, highlight projects, and skill proof.
+- **Completion Certificate (`/certificate`)**: Verifiable completion credential card with QR code verification and track details.
+- **AI Technical Interview Prep (`/prep`)**: AI-generated technical interview practice cards and mock questions tailored to completed task skills.
+- **Peer Building Squads (`/squad`)**: Peer accountability groups with daily check-ins, squad leaderboards, and shared momentum tracking.
 - **Dynamic Share Card**: In-browser shareable proof card for milestones and completions.
 
 ### 🟥 Platform Infrastructure
+- **Live GitHub Verification (`src/lib/github.functions.ts`)**: Automated commit checking and repo verification via GitHub REST API integrations.
+- **Notifications & Reminders (`src/lib/notifications.ts`)**: Web push notification engine and configurable evening streak reminders.
 - **PWA Ready**: Manifest, service worker support, and mobile viewport optimization (390px default).
 - **Time-Aware Nudges**: Morning/Evening/Late-Night context banners encouraging students to log proof before midnight.
 - **Custom 404 & Error Boundaries**: Fully styled error components matching the brutalist design system.
