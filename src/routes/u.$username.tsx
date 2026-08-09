@@ -120,7 +120,7 @@ function PublicProfile() {
   const viewedTrackId =
     "selectedTrackId" in student ? (student.selectedTrackId ?? "web-dev") : "web-dev";
   const xp = computeXp(days, profile ? store.dayStatusOverrides : {}, viewedTrackId);
-  const { level } = levelProgress(xp);
+  const { level, nextLevelXp, progress } = levelProgress(xp);
 
   return (
     <div className="min-h-screen grid-bg bg-base">
